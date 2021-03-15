@@ -18,7 +18,7 @@ defmodule VintageNetQMI do
   @impl VintageNet.Technology
   def to_raw_config(
         ifname,
-        %{type: __MODULE__, vintage_net_qmi: _qmi} = config,
+        %{type: __MODULE__, vintage_net_qmi: qmi} = config,
         opts
       ) do
     normalized_config = normalize(config)
@@ -30,29 +30,25 @@ defmodule VintageNetQMI do
       {:fun, fn -> File.write!("/sys/class/net/#{ifname}/qmi/raw_ip", "Y") end}
     ]
 
+    child_specs = [
+      {VintageNetQMI.Connection,
+       [ifname: ifname, device: qmi.device, service_provider: qmi.service_provider]}
+      # {VintageNetQMI.CellMonitor, [ifname: ifname, device: qmi.device]}
+    ]
+
     config =
       %RawConfig{
         ifname: ifname,
         type: __MODULE__,
         source_config: config,
         required_ifnames: [ifname],
-        up_cmds: up_cmds
+        up_cmds: up_cmds,
+        child_specs: child_specs
       }
-      |> add_to_raw_config(config)
       |> IPv4Config.add_config(normalized_config, opts)
       |> DhcpdConfig.add_config(normalized_config, opts)
 
     config
-  end
-
-  defp add_to_raw_config(raw_config, %{vintage_net_qmi: qmi}) do
-    child_specs = [
-      {VintageNetQMI.Connection,
-       [ifname: raw_config.ifname, device: qmi.device, service_provider: qmi.service_provider]},
-      {VintageNetQMI.CellMonitor, [ifname: raw_config.ifname, device: qmi.device]}
-    ]
-
-    %RawConfig{raw_config | child_specs: child_specs}
   end
 
   @impl VintageNet.Technology

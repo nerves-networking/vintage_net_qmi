@@ -44,14 +44,18 @@ defmodule VintageNetQMI.Connection do
     end
   end
 
-  defp connect(%{device: device, control_point: cp, service_provider: apn}) do
-    {:ok, message} = WirelessData.start_network_interface(device, {1, cp.client_id}, apn: apn)
+  defp connect(%{device: device, control_point: cp, service_provider: apn} = state) do
+    case WirelessData.start_network_interface(device, {1, cp.client_id}, apn: apn) do
+      {:ok, _message} ->
+        :ok
 
-    require Logger
+      # this error is when the device has already started the network connection
+      {:error, %{error: :no_effect}} ->
+        :ok
 
-    Logger.warn("Message: #{inspect(message)}")
-
-    message
+      {:error, :timeout} ->
+        connect(state)
+    end
   end
 
   @impl GenServer
