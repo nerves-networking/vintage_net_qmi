@@ -33,7 +33,8 @@ defmodule VintageNetQMI do
     child_specs = [
       {VintageNetQMI.Connection,
        [ifname: ifname, device: qmi.device, service_provider: qmi.service_provider]},
-      {VintageNetQMI.CellMonitor, [ifname: ifname, device: qmi.device]}
+      {VintageNetQMI.CellMonitor, [ifname: ifname, device: qmi.device]},
+      {VintageNetQMI.SignalMonitor, [ifname: ifname, device: qmi.device]}
     ]
 
     config =
