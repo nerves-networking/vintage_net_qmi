@@ -35,6 +35,8 @@ defmodule VintageNetQMI.Connection do
 
         connect(state)
 
+        Process.sleep(5_000)
+
         {:ok, state}
 
       error ->

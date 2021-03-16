@@ -19,20 +19,15 @@ defmodule VintageNetQMI.CellMonitor do
 
     {:ok, nas} = QMI.get_control_point(device, NetworkAccess)
 
-    _ = :timer.send_interval(30_000, :poll)
+    _ = :timer.send_interval(25_000, :poll)
 
     {:ok, %{ifname: ifname, device: device, control_point: nas}, {:continue, :get_stats}}
   end
 
   @impl GenServer
   def handle_continue(:get_stats, state) do
-    %{ifname: ifname, device: device, control_point: control_point} = state
-
-    resp = NetworkAccess.get_sys_info(device, {0x03, control_point.client_id})
-
-    require Logger
-
-    Logger.warn("#{inspect(resp)}")
+    # PropertyTable.put(VintageNet, ["interface", ifname, "mobile", "mcc"], mcc)
+    # PropertyTable.put(VintageNet, ["interface", ifname, "mobile", "mnc"], mnc)
 
     {:noreply, state}
   end
@@ -46,6 +41,22 @@ defmodule VintageNetQMI.CellMonitor do
   end
 
   def handle_info(:poll, state) do
+    %{control_point: control_point, ifname: ifname} = state
+
+    # probably don't want home network
+    {binary, decoder} = QMI.Service.NetworkAccess.get_home_network()
+
+    {:ok, message} = QMI.send_binary(control_point, binary)
+
+    %{mcc: mcc, mnc: mnc} = decoder.(message)
+
+    PropertyTable.put(VintageNet, ["interface", ifname, "mobile", "mcc"], mcc)
+    PropertyTable.put(VintageNet, ["interface", ifname, "mobile", "mnc"], mnc)
+
+    {:noreply, state}
+  end
+
+  def handle_info(_message, state) do
     {:noreply, state}
   end
 end
