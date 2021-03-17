@@ -6,6 +6,8 @@ defmodule VintageNetQMI.Connection do
 
   alias QMI.Service.WirelessData
 
+  require Logger
+
   @type arg() ::
           {:ifname, VintageNet.ifname()} | {:device, String.t()} | {:service_provider, String.t()}
 
@@ -18,14 +20,11 @@ defmodule VintageNetQMI.Connection do
     ifname = Keyword.fetch!(args, :ifname)
     device = Keyword.fetch!(args, :device)
     service_provider = Keyword.fetch!(args, :service_provider)
-    require Logger
 
     Process.sleep(10_000)
 
     case QMI.get_control_point(device, WirelessData) do
       {:ok, cp} ->
-        Logger.warn("Got CP: #{inspect(cp)}")
-
         state = %{
           ifname: ifname,
           device: device,
