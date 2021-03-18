@@ -22,7 +22,7 @@ defmodule VintageNetQmi.MixProject do
   defp deps do
     [
       {:vintage_net, "~> 0.9.2"},
-      {:qmi, path: "../qmi"},
+      {:qmi, "~> 0.1.0", organization: "smartrent"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},

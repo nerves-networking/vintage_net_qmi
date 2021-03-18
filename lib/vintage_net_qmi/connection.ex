@@ -53,6 +53,8 @@ defmodule VintageNetQMI.Connection do
         :ok
 
       {:error, :timeout} ->
+        Logger.warn("QMI Connection timed out, retrying")
+        Process.sleep(5_000)
         connect(state)
     end
   end
