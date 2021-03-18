@@ -1,21 +1,13 @@
-# VintageNetQmi
+# VintageNetQMI
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `vintage_net_qmi` to your list of dependencies in `mix.exs`:
+VintageNet technology support for QMI mobile connections.
 
 ```elixir
-def deps do
-  [
-    {:vintage_net_qmi, "~> 0.1.0"}
-  ]
-end
+{<interface_name>,
+ %{
+    type: VintageNetQMI,
+    vintage_net_qmi: %{service_provider: <apn_name>, device: <device>},
+    ipv4: %{method: :dhcp}
+  }}
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/vintage_net_qmi](https://hexdocs.pm/vintage_net_qmi).
 
