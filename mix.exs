@@ -31,7 +31,7 @@ defmodule VintageNetQMI.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:vintage_net, "~> 0.9.2"},
+      {:vintage_net, "~> 0.10.0"},
       {:qmi, "~> 0.1.0", organization: "smartrent"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
