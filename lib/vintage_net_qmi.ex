@@ -8,6 +8,12 @@ defmodule VintageNetQMI do
   alias VintageNet.Interface.RawConfig
   alias VintageNet.IP.{DhcpdConfig, IPv4Config}
 
+  @doc """
+  Name of the the QMI server that VintageNetQMI uses
+  """
+  @spec qmi_name() :: QMI.nme()
+  def qmi_name(), do: QMI
+
   @impl VintageNet.Technology
   def normalize(config) do
     config
@@ -24,17 +30,14 @@ defmodule VintageNetQMI do
     normalized_config = normalize(config)
 
     up_cmds = [
-      # This might not be true for all modems as some support 802.3 IP framing,
-      # however, on the EC25 supports raw IP framing. This feature can be detected
-      # and is probably a better solution that just forcing the raw IP framing.
-      {:fun, fn -> File.write!("/sys/class/net/#{ifname}/qmi/raw_ip", "Y") end}
+      {:fun, QMI, :configure_linux, [ifname]}
     ]
 
     child_specs = [
-      {VintageNetQMI.Connection,
-       [ifname: ifname, device: qmi.device, service_provider: qmi.service_provider]},
-      {VintageNetQMI.CellMonitor, [ifname: ifname, device: qmi.device]},
-      {VintageNetQMI.SignalMonitor, [ifname: ifname, device: qmi.device]}
+      {QMI, [ifname: "wwan0", name: qmi_name()]},
+      {VintageNetQMI.Connection, [service_provider: qmi.service_provider]},
+      {VintageNetQMI.CellMonitor, [ifname: ifname]},
+      {VintageNetQMI.SignalMonitor, [ifname: ifname]}
     ]
 
     config =
