@@ -16,10 +16,10 @@ defmodule VintageNetQMITest do
       source_config: input,
       required_ifnames: ["wwan0"],
       child_specs: [
-        {VintageNetQMI.Connection,
-         [ifname: "wwan0", device: "/dev/cdc-wdm0", service_provider: "super"]},
-        {VintageNetQMI.CellMonitor, [ifname: "wwan0", device: "/dev/cdc-wdm0"]},
-        {VintageNetQMI.SignalMonitor, [ifname: "wwan0", device: "/dev/cdc-wdm0"]},
+        {QMI, [ifname: "wwan0", name: QMI]},
+        {VintageNetQMI.Connection, [service_provider: "super"]},
+        {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
+        {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
         Utils.udhcpc_child_spec("wwan0", "unit_test"),
         {VintageNet.Interface.InternetConnectivityChecker, "wwan0"}
       ],
@@ -27,7 +27,10 @@ defmodule VintageNetQMITest do
         {:run_ignore_errors, "ip", ["addr", "flush", "dev", "wwan0", "label", "wwan0"]},
         {:run, "ip", ["link", "set", "wwan0", "down"]}
       ],
-      up_cmds: [{:run, "ip", ["link", "set", "wwan0", "up"]}]
+      up_cmds: [
+        {:fun, QMI, :configure_linux, ["wwan0"]},
+        {:run, "ip", ["link", "set", "wwan0", "up"]}
+      ]
     }
 
     assert output == VintageNetQMI.to_raw_config("wwan0", input, Utils.default_opts())
