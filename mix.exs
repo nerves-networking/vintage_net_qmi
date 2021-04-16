@@ -1,7 +1,7 @@
 defmodule VintageNetQMI.MixProject do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.1.2"
   @source_url "https://github.com/smartrent/vintage_net_qmi"
 
   def project do
@@ -11,6 +11,7 @@ defmodule VintageNetQMI.MixProject do
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      description: description(),
       docs: docs(),
       package: package(),
       preferred_cli_env: [
@@ -38,6 +39,10 @@ defmodule VintageNetQMI.MixProject do
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
       {:excoveralls, "~> 0.14", only: :test, runtime: false}
     ]
+  end
+
+  defp description do
+    "VintageNet QMI support"
   end
 
   def docs do
