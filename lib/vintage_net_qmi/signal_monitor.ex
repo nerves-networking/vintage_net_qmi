@@ -16,7 +16,7 @@ defmodule VintageNetQMI.SignalMonitor do
 
   @impl GenServer
   def init(args) do
-    interval = Keyword.get(args, :interval, 5_000)
+    interval = Keyword.get(args, :interval, 30_000)
     ifname = Keyword.fetch!(args, :ifname)
 
     Process.send_after(self(), :signal_check, interval)
@@ -25,8 +25,6 @@ defmodule VintageNetQMI.SignalMonitor do
       ifname: ifname,
       interval: interval
     }
-
-    :ok = get_signal_stats(state)
 
     {:ok, state}
   end
