@@ -1,10 +1,16 @@
 defmodule VintageNetQMI.CellMonitor do
   use GenServer
 
-  @type arg() :: {:ifname, binary()}
+  @type arg() :: {:ifname, binary(), poll_interval: non_neg_integer()}
+
+  require Logger
 
   alias VintageNet.PropertyTable
   alias QMI.NetworkAccess
+
+  defp init_state(ifname, poll_interval) do
+    %{ifname: ifname, poll_interval: poll_interval, poll_reference: nil}
+  end
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args)
@@ -13,12 +19,11 @@ defmodule VintageNetQMI.CellMonitor do
   @impl GenServer
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
+    poll_interval = Keyword.get(args, :poll_interval, 25_000)
 
     VintageNet.subscribe(["interface", ifname, "connection"])
 
-    _ = :timer.send_interval(25_000, :poll)
-
-    {:ok, %{ifname: ifname}}
+    {:ok, init_state(ifname, poll_interval)}
   end
 
   @impl GenServer
@@ -26,23 +31,50 @@ defmodule VintageNetQMI.CellMonitor do
         {VintageNet, ["interface", ifname, "connection"], _old, :internet, _meta},
         %{ifname: ifname} = state
       ) do
+    {:ok, poll_ref} = :timer.send_interval(state.poll_interval, :poll)
+
+    state =
+      get_home_network()
+      |> maybe_post_home_network(state)
+      |> put_poll_ref(poll_ref)
+
     {:noreply, state}
   end
 
   def handle_info(:poll, state) do
-    case NetworkAccess.get_home_network(VintageNetQMI.qmi_name()) do
-      {:ok, %{mcc: mcc, mnc: mnc}} ->
-        PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mcc"], mcc)
-        PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mnc"], mnc)
-
-      {:ok, _} ->
-        {:noreply, state}
-    end
+    state =
+      get_home_network()
+      |> maybe_post_home_network(state)
 
     {:noreply, state}
   end
 
   def handle_info(_message, state) do
     {:noreply, state}
+  end
+
+  defp maybe_post_home_network({:ok, %{mcc: mcc, mnc: mnc}}, state) do
+    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mcc"], mcc)
+    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mnc"], mnc)
+
+    state
+  end
+
+  defp maybe_post_home_network({:erorr, _reason} = error, state) do
+    _ = Logger.warn("[VintageNetQMI] failed getting home network: #{inspect(error)}")
+    state
+  end
+
+  defp maybe_post_home_network(_, state) do
+    state
+  end
+
+  defp get_home_network() do
+    VintageNetQMI.qmi_name()
+    |> NetworkAccess.get_home_network()
+  end
+
+  defp put_poll_ref(state, poll_ref) do
+    %{state | poll_reference: poll_ref}
   end
 end

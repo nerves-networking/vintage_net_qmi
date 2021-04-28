@@ -1,16 +1,28 @@
 defmodule VintageNetQMI.Connection do
-  use GenServer
+  @moduledoc """
+  Establish an connection with the QMI device
+  """
 
-  # GenServer for the connection
-  # needs to handle control point management
+  use GenServer
 
   alias QMI.WirelessData
 
   require Logger
 
+  @try_connect_interval 20_000
+
+  @typedoc """
+  Options for to establish the connection
+
+  `:apn` - The Access Point Name of the service provider
+  """
   @type arg() ::
           {:service_provider, String.t()}
 
+  @doc """
+  Start the Connection server
+  """
+  @spec start_link([arg()]) :: GenServer.on_start()
   def start_link(args) do
     GenServer.start_link(__MODULE__, args)
   end
@@ -19,36 +31,32 @@ defmodule VintageNetQMI.Connection do
   def init(args) do
     service_provider = Keyword.fetch!(args, :service_provider)
 
-    Process.sleep(10_000)
-
     state = %{
       service_provider: service_provider
     }
 
-    connect(state)
+    :ok = start_connect_timer()
 
     {:ok, state}
   end
 
-  defp connect(state) do
+  @impl GenServer
+  def handle_info(:connect, state) do
     case WirelessData.start_network_interface(VintageNetQMI.qmi_name(),
            apn: state.service_provider
          ) do
       {:ok, _} ->
-        :ok
+        {:noreply, state}
 
-      {:error, _reason} ->
-        Logger.warn("[VintageNetQMI]: could not connect, trying again.")
-        Process.sleep(5_000)
-        connect(state)
+      {:error, reason} ->
+        Logger.warn("[VintageNetQMI]: could not connect for #{inspect(reason)}.")
+        start_connect_timer()
+        {:noreply, state}
     end
   end
 
-  @impl GenServer
-  def handle_info(message, state) do
-    require Logger
-
-    Logger.warn("#{inspect(message)}")
-    {:noreply, state}
+  defp start_connect_timer() do
+    _ = Process.send_after(self(), :connect, @try_connect_interval)
+    :ok
   end
 end
