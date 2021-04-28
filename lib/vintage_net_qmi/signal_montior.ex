@@ -41,7 +41,8 @@ defmodule VintageNetQMI.SignalMonitor do
   end
 
   defp get_signal_stats(state) do
-    {:ok, %{rssis: [rssi_data]}} = NetworkAccess.get_signal_strength(VintageNetQMI.qmi_name())
+    {:ok, %{rssi_reports: [rssi_data]}} =
+      NetworkAccess.get_signal_strength(VintageNetQMI.qmi_name())
 
     rssi_data
     |> to_rssi()
