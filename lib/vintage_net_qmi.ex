@@ -11,8 +11,8 @@ defmodule VintageNetQMI do
   @doc """
   Name of the the QMI server that VintageNetQMI uses
   """
-  @spec qmi_name() :: QMI.nme()
-  def qmi_name(), do: QMI
+  @spec qmi_name(VintageNet.ifname()) :: atom()
+  def qmi_name(ifname), do: Module.concat(VintageNetQMI.QMI, ifname)
 
   @impl VintageNet.Technology
   def normalize(config) do
@@ -34,8 +34,8 @@ defmodule VintageNetQMI do
     ]
 
     child_specs = [
-      {QMI, [ifname: "wwan0", name: qmi_name()]},
-      {VintageNetQMI.Connection, [service_provider: qmi.service_provider]},
+      {QMI, [ifname: ifname, name: qmi_name(ifname)]},
+      {VintageNetQMI.Connection, [ifname: ifname, service_provider: qmi.service_provider]},
       {VintageNetQMI.CellMonitor, [ifname: ifname]},
       {VintageNetQMI.SignalMonitor, [ifname: ifname]}
     ]
