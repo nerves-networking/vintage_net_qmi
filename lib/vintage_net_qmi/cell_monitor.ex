@@ -65,18 +65,9 @@ defmodule VintageNetQMI.CellMonitor do
     state
   end
 
-  defp maybe_post_home_network({:erorr, _reason} = error, state) do
+  defp maybe_post_home_network({:error, _reason} = error, state) do
     _ = Logger.warn("[VintageNetQMI] failed getting home network: #{inspect(error)}")
     state
-  end
-
-  defp maybe_post_home_network(_, state) do
-    state
-  end
-
-  defp get_home_network() do
-    VintageNetQMI.qmi_name()
-    |> NetworkAccess.get_home_network()
   end
 
   defp put_poll_ref(state, poll_ref) do
