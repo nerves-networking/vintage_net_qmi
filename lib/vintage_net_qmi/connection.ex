@@ -29,9 +29,11 @@ defmodule VintageNetQMI.Connection do
 
   @impl GenServer
   def init(args) do
+    ifname = Keyword.fetch!(args, :ifname)
     service_provider = Keyword.fetch!(args, :service_provider)
 
     state = %{
+      qmi: VintageNetQMI.qmi_name(ifname),
       service_provider: service_provider
     }
 
@@ -42,7 +44,7 @@ defmodule VintageNetQMI.Connection do
 
   @impl GenServer
   def handle_info(:connect, state) do
-    case WirelessData.start_network_interface(VintageNetQMI.qmi_name(),
+    case WirelessData.start_network_interface(state.qmi,
            apn: state.service_provider
          ) do
       {:ok, _} ->

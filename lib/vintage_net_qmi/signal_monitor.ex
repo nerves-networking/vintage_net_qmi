@@ -23,6 +23,7 @@ defmodule VintageNetQMI.SignalMonitor do
 
     state = %{
       ifname: ifname,
+      qmi: VintageNetQMI.qmi_name(ifname),
       interval: interval
     }
 
@@ -39,8 +40,7 @@ defmodule VintageNetQMI.SignalMonitor do
   end
 
   defp get_signal_stats(state) do
-    {:ok, %{rssi_reports: [rssi_data]}} =
-      NetworkAccess.get_signal_strength(VintageNetQMI.qmi_name())
+    {:ok, %{rssi_reports: [rssi_data]}} = NetworkAccess.get_signal_strength(state.qmi)
 
     rssi_data
     |> to_rssi()

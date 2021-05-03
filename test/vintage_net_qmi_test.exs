@@ -16,8 +16,8 @@ defmodule VintageNetQMITest do
       source_config: input,
       required_ifnames: ["wwan0"],
       child_specs: [
-        {QMI, [ifname: "wwan0", name: QMI]},
-        {VintageNetQMI.Connection, [service_provider: "super"]},
+        {QMI, [ifname: "wwan0", name: :"Elixir.VintageNetQMI.QMI.wwan0"]},
+        {VintageNetQMI.Connection, [{:ifname, "wwan0"}, {:service_provider, "super"}]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
         Utils.udhcpc_child_spec("wwan0", "unit_test"),

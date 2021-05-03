@@ -9,7 +9,12 @@ defmodule VintageNetQMI.CellMonitor do
   alias QMI.NetworkAccess
 
   defp init_state(ifname, poll_interval) do
-    %{ifname: ifname, poll_interval: poll_interval, poll_reference: nil}
+    %{
+      ifname: ifname,
+      qmi: VintageNetQMI.qmi_name(ifname),
+      poll_interval: poll_interval,
+      poll_reference: nil
+    }
   end
 
   def start_link(args) do
@@ -34,7 +39,7 @@ defmodule VintageNetQMI.CellMonitor do
     {:ok, poll_ref} = :timer.send_interval(state.poll_interval, :poll)
 
     state =
-      get_home_network()
+      NetworkAccess.get_home_network(state.qmi)
       |> maybe_post_home_network(state)
       |> put_poll_ref(poll_ref)
 
@@ -43,7 +48,7 @@ defmodule VintageNetQMI.CellMonitor do
 
   def handle_info(:poll, state) do
     state =
-      get_home_network()
+      NetworkAccess.get_home_network(state.qmi)
       |> maybe_post_home_network(state)
 
     {:noreply, state}
