@@ -16,8 +16,7 @@ defmodule VintageNetQMI.Connection do
 
   `:apn` - The Access Point Name of the service provider
   """
-  @type arg() ::
-          {:service_provider, String.t()}
+  @type arg() :: {:service_provider, String.t()}
 
   @doc """
   Start the Connection server
