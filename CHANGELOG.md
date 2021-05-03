@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.3
+
+* Updates
+  * Support `qmi` v0.3.1
+
+* Fixes
+  * Connection code blocking supervision initialization
+
+
 ## v0.1.2
 
 * Updates
