@@ -6,6 +6,7 @@ defmodule VintageNetQMI.Connection do
   use GenServer
 
   alias QMI.WirelessData
+  alias VintageNet.{PropertyTable, RouteManager}
 
   require Logger
 
@@ -29,14 +30,26 @@ defmodule VintageNetQMI.Connection do
   @impl GenServer
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
-    service_provider = Keyword.fetch!(args, :service_provider)
+    service_providers = Keyword.fetch!(args, :service_providers)
 
     state = %{
+      ifname: ifname,
       qmi: VintageNetQMI.qmi_name(ifname),
-      service_provider: service_provider
+      service_providers: service_providers
     }
 
-    :ok = start_connect_timer()
+    VintageNet.subscribe(["interface", ifname, "addresses"])
+    addresses = VintageNet.get(["interface", ifname, "addresses"], [])
+
+    if Enum.any?(addresses, &ipv4?/1) do
+      # If there's an IPv4 address, we're already connected. Maybe there was
+      # a crash, but hey, it's connected, so we should be good.
+      set_connectivity(ifname, :internet)
+    else
+      set_connectivity(ifname, :disconnected)
+
+      :ok = start_connect_timer()
+    end
 
     {:ok, state}
   end
@@ -44,9 +57,11 @@ defmodule VintageNetQMI.Connection do
   @impl GenServer
   def handle_info(:connect, state) do
     case WirelessData.start_network_interface(state.qmi,
-           apn: state.service_provider
+           apn: first_apn(state.service_providers)
          ) do
       {:ok, _} ->
+        Logger.warn("[VintageNetQMI]: network started. Waiting on DHCP")
+        # Internet connectivity is determined once DHCP returns so this is not
         {:noreply, state}
 
       {:error, reason} ->
@@ -56,8 +71,30 @@ defmodule VintageNetQMI.Connection do
     end
   end
 
+  def handle_info(
+        {VintageNet, ["interface", ifname, "addresses"], _old, addresses, _meta},
+        %{ifname: ifname} = state
+      ) do
+    if Enum.any?(addresses, &ipv4?/1) do
+      # If there's an IPv4 address, then DHCP worked.
+      set_connectivity(ifname, :internet)
+    end
+
+    {:noreply, state}
+  end
+
+  defp ipv4?(%{family: :inet}), do: true
+  defp ipv4?(_), do: false
+
   defp start_connect_timer() do
     _ = Process.send_after(self(), :connect, @try_connect_interval)
     :ok
   end
+
+  defp set_connectivity(ifname, connectivity) do
+    RouteManager.set_connection_status(ifname, connectivity)
+    PropertyTable.put(VintageNet, ["interface", ifname, "connection"], connectivity)
+  end
+
+  defp first_apn([%{apn: apn} | _rest]), do: apn
 end

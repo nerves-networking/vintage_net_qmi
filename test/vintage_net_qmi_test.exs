@@ -2,11 +2,10 @@ defmodule VintageNetQMITest do
   use ExUnit.Case
   alias VintageNet.Interface.RawConfig
 
-  test "create a wired ethernet configuration" do
+  test "create a simple qmi configuration" do
     input = %{
       type: VintageNetQMI,
-      vintage_net_qmi: %{service_provider: "super", device: "/dev/cdc-wdm0"},
-      ipv4: %{method: :dhcp},
+      vintage_net_qmi: %{service_providers: [%{apn: "super"}]},
       hostname: "unit_test"
     }
 
@@ -17,11 +16,10 @@ defmodule VintageNetQMITest do
       required_ifnames: ["wwan0"],
       child_specs: [
         {QMI, [ifname: "wwan0", name: :"Elixir.VintageNetQMI.QMI.wwan0"]},
-        {VintageNetQMI.Connection, [{:ifname, "wwan0"}, {:service_provider, "super"}]},
+        {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
-        Utils.udhcpc_child_spec("wwan0", "unit_test"),
-        {VintageNet.Interface.InternetConnectivityChecker, "wwan0"}
+        Utils.udhcpc_child_spec("wwan0", "unit_test")
       ],
       down_cmds: [
         {:run_ignore_errors, "ip", ["addr", "flush", "dev", "wwan0", "label", "wwan0"]},
