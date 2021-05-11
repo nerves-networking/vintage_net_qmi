@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.0
+
+* Updates
+  * Change configuration to match VintageNetMobile (backwards incompatible)
+  * Don't require IPv4 configuration
+
 ## v0.1.3
 
 * Updates
@@ -7,7 +13,6 @@
 
 * Fixes
   * Connection code blocking supervision initialization
-
 
 ## v0.1.2
 
