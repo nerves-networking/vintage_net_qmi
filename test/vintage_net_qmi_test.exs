@@ -15,7 +15,7 @@ defmodule VintageNetQMITest do
       source_config: input,
       required_ifnames: ["wwan0"],
       child_specs: [
-        {QMI, [ifname: "wwan0", name: :"Elixir.VintageNetQMI.QMI.wwan0"]},
+        {QMI.Supervisor, [ifname: "wwan0", name: :"Elixir.VintageNetQMI.QMI.wwan0"]},
         {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},

@@ -34,7 +34,7 @@ defmodule VintageNetQMI.MixProject do
   defp deps do
     [
       {:vintage_net, "~> 0.10.0"},
-      {:qmi, "~> 0.3.0", path: "../qmi", organization: "smartrent"},
+      {:qmi, "~> 0.4.0", organization: "smartrent"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
