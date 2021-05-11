@@ -66,7 +66,7 @@ defmodule VintageNetQMI do
 
   def normalize(_config) do
     raise ArgumentError,
-          "specify an vintage_net_qmi options (service_providers: [%{apn: \"super\"}])"
+          "specify vintage_net_qmi options (e.g., %{vintage_net_qmi: %{service_providers: [%{apn: \"super\"}]}})"
   end
 
   defp require_a_service_provider(
