@@ -12,6 +12,9 @@ defmodule VintageNetQMI.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
+      dialyzer: [
+        flags: [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
+      ],
       docs: docs(),
       package: package(),
       preferred_cli_env: [
@@ -22,27 +25,25 @@ defmodule VintageNetQMI.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:vintage_net, "~> 0.10.0"},
-      {:qmi, "~> 0.3.0", organization: "smartrent"},
+      {:qmi, "~> 0.3.0", path: "../qmi", organization: "smartrent"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
       {:excoveralls, "~> 0.14", only: :test, runtime: false}
     ]
   end
 
   defp description do
-    "VintageNet QMI support"
+    "VintageNet Support for QMI Cellular Modems"
   end
 
   def docs do
@@ -58,14 +59,15 @@ defmodule VintageNetQMI.MixProject do
 
   def package do
     [
-      licenses: ["Proprietary"],
-      links: %{"GitHub" => @source_url},
       files: [
         "lib",
         "CHANGELOG.md",
+        "LICENSE",
         "mix.exs",
         "README.md"
       ],
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => @source_url},
       organization: "smartrent"
     ]
   end
