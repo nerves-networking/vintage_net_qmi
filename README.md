@@ -40,27 +40,28 @@ the APN that they gave you.
 ## VintageNet Properties
 
 In addition to the common `vintage_net` properties for all interface types, this
-technology reports one or more of the following:
+technology the following:
 
 | Property      | Values         | Description                   |
 | ------------- | -------------- | ----------------------------- |
 | `signal_asu`  | `0-31,99`      | Reported Arbitrary Strength Unit (ASU) |
 | `signal_4bars` | `0-4`         | The signal level in "bars"    |
 | `signal_dbm`  | `-144 - -44`   | The signal level in dBm. Interpretation depends on the connection technology. |
-| `signal_rssi` | `0-31` or `99` | An integer between 0-31 or 99 |
-| `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
-| `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
 | `mcc`         | `0-999`        | Mobile Country Code for the network |
 | `mnc`         | `0-999`        | Mobile Network Code for the network |
+
+The following properties are TBD:
+
+| Property      | Values         | Description                   |
+| ------------- | -------------- | ----------------------------- |
 | `network`     | string         | The network operator's name |
+| `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
+| `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
 | `access_technology` | string   | The technology currently in use to connect to the network |
 | `band`        | string         | The frequency band in use |
 | `channel`     | integer        | An integer that indicates the channel that's in use |
 | `iccid`       | string         | The Integrated Circuit Card Identifier (ICCID) |
 | `imsi`        | string         | The International Mobile Subscriber Identity (IMSI) |
-
-Please check your modem implementation for which properties it supports or run
-`VintageNet.get_by_prefix(["interface", "wwan0"])` and see what happens.
 
 ## System requirements
 
