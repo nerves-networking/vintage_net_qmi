@@ -122,7 +122,13 @@ defmodule VintageNetQMI do
     ]
 
     child_specs = [
-      {QMI.Supervisor, [ifname: ifname, name: qmi_name(ifname)]},
+      {VintageNetQMI.Indications, ifname: ifname},
+      {QMI.Supervisor,
+       [
+         ifname: ifname,
+         name: qmi_name(ifname),
+         indication_callback: &VintageNetQMI.Indications.handle(ifname, &1)
+       ]},
       {VintageNetQMI.Connection,
        [ifname: ifname, service_providers: normalized_config.vintage_net_qmi.service_providers]},
       {VintageNetQMI.CellMonitor, [ifname: ifname]},
