@@ -6,7 +6,7 @@ defmodule VintageNetQMI.Connection do
   use GenServer
 
   alias QMI.WirelessData
-  alias VintageNet.{PropertyTable, RouteManager}
+  alias VintageNetQMI.Connectivity
 
   require Logger
 
@@ -44,9 +44,9 @@ defmodule VintageNetQMI.Connection do
     if Enum.any?(addresses, &ipv4?/1) do
       # If there's an IPv4 address, we're already connected. Maybe there was
       # a crash, but hey, it's connected, so we should be good.
-      set_connectivity(ifname, :internet)
+      Connectivity.set_connectivity(ifname, :internet)
     else
-      set_connectivity(ifname, :disconnected)
+      Connectivity.set_connectivity(ifname, :disconnected)
 
       :ok = start_connect_timer()
     end
@@ -77,7 +77,7 @@ defmodule VintageNetQMI.Connection do
       ) do
     if Enum.any?(addresses, &ipv4?/1) do
       # If there's an IPv4 address, then DHCP worked.
-      set_connectivity(ifname, :internet)
+      Connectivity.set_connectivity(ifname, :internet)
     end
 
     {:noreply, state}
@@ -89,11 +89,6 @@ defmodule VintageNetQMI.Connection do
   defp start_connect_timer() do
     _ = Process.send_after(self(), :connect, @try_connect_interval)
     :ok
-  end
-
-  defp set_connectivity(ifname, connectivity) do
-    RouteManager.set_connection_status(ifname, connectivity)
-    PropertyTable.put(VintageNet, ["interface", ifname, "connection"], connectivity)
   end
 
   defp first_apn([%{apn: apn} | _rest]), do: apn
