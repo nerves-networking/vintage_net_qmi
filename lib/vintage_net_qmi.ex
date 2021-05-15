@@ -53,6 +53,7 @@ defmodule VintageNetQMI do
 
   alias VintageNet.Interface.RawConfig
   alias VintageNet.IP.IPv4Config
+  alias VintageNetQMI.Cookbook
 
   @doc """
   Name of the the QMI server that VintageNetQMI uses
@@ -168,4 +169,19 @@ defmodule VintageNetQMI do
 
   @impl VintageNet.Technology
   def ioctl(_ifname, _command, _args), do: {:error, :unsupported}
+
+  @doc """
+  Configure a cellular modem using an APN
+
+  ```
+  iex> VintageNetQMI.quick_configure("an_apn")
+  :ok
+  ```
+  """
+  @spec quick_configure(String.t()) :: :ok | {:error, term()}
+  def quick_configure(apn) do
+    with {:ok, config} <- Cookbook.simple(apn) do
+      VintageNet.configure("wwan0", config)
+    end
+  end
 end

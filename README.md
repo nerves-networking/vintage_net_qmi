@@ -20,14 +20,38 @@ def deps do
 end
 ```
 
-You will then need to configure `VintageNet`. The cellular modem should show
-up on "wwan0", so configurations look like this:
+You will then need to configure `VintageNet`. The easiest way to configure
+a modem at runtime is by calling `VintageNetQMI.quick_configure("the_apn")`.
+For example:
+
+```elixir
+iex> VintageNetQMI.quick_configure("the_apn")
+:ok
+# wait...
+iex> VintageNet.info
+Interface wwan0
+  Type: VintageNetQMI
+  Power: On (watchdog timeout in 51628 ms)
+  Present: true
+  State: :configured (0:41:09)
+  Connection: :internet (0:40:28)
+  Addresses: 100.79.205.206/30, fe80::723c:bdc9:10e4:d092/64
+  Configuration:
+    %{
+      type: VintageNetQMI,
+      vintage_net_qmi: %{service_providers: [%{apn: "the_apn"}]}
+    }
+```
+
+You can't always call `quick_configure/1` convenience function so here's the
+regular configuration. If you are moving code from `vintage_net_mobile`, you'll
+notice that this format is very similar except that `Mobile` is now `QMI`.
 
 ```elixir
 VintageNet.configure("wwan0", %{
       type: VintageNetQMI,
       vintage_net_qmi: %{
-        service_providers: [%{apn: "fill_in"}]
+        service_providers: [%{apn: "the_apn"}]
       }
     })
 ```
