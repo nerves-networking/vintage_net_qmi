@@ -52,6 +52,7 @@ defmodule VintageNetQMI do
   @behaviour VintageNet.Technology
 
   alias VintageNet.Interface.RawConfig
+  alias VintageNet.IP.IPv4Config
 
   @doc """
   Name of the the QMI server that VintageNetQMI uses
@@ -147,7 +148,7 @@ defmodule VintageNetQMI do
         up_cmds: up_cmds,
         child_specs: child_specs
       }
-      |> VintageNet.IP.IPv4Config.add_config(ipv4_config, [])
+      |> IPv4Config.add_config(ipv4_config, [])
       |> remove_connectivity_detector()
 
     config

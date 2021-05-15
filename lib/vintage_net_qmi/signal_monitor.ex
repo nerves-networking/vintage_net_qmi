@@ -1,12 +1,12 @@
 defmodule VintageNetQMI.SignalMonitor do
-  @moduledoc """
+  @moduledoc false
 
-  """
   use GenServer
 
+  alias QMI.NetworkAccess
+  alias VintageNet.PowerManager.PMControl
   alias VintageNet.PropertyTable
   alias VintageNetQMI.ASUCalculator
-  alias QMI.NetworkAccess
 
   @type opt() :: {:ifname, binary()} | {:interval, non_neg_integer()}
 
@@ -53,7 +53,7 @@ defmodule VintageNetQMI.SignalMonitor do
   end
 
   defp maybe_pet_power_control(%{bars: bars} = report, ifname) when bars > 0 do
-    VintageNet.PowerManager.PMControl.pet_watchdog(ifname)
+    PMControl.pet_watchdog(ifname)
     report
   end
 
