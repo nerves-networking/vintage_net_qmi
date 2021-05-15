@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.1
+
+* Updates
+  * Set connection based on QMI notifications
+
 ## v0.2.0
 
 * Updates
