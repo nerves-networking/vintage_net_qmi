@@ -1,12 +1,14 @@
 defmodule VintageNetQMI.CellMonitor do
+  @moduledoc false
+
   use GenServer
 
   @type arg() :: {:ifname, binary(), poll_interval: non_neg_integer()}
 
   require Logger
 
-  alias VintageNet.PropertyTable
   alias QMI.NetworkAccess
+  alias VintageNet.PropertyTable
 
   defp init_state(ifname, poll_interval) do
     %{
