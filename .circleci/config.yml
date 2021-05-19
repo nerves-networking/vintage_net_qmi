@@ -18,6 +18,10 @@ install_system_deps: &install_system_deps
     command: |
         apk add build-base linux-headers libmnl-dev libnl3-dev git
 
+# TODO: Remove this when open sourced and remove env key from CI
+smartrent_hex_org: &smartrent_hex_org
+  run: mix hex.organization auth smartrent --key $SMARTRENT_HEX_KEY
+
 jobs:
   build_elixir_1_11_otp_23:
     docker:
@@ -30,6 +34,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-mix-cache-{{ checksum "mix.lock" }}
+      - <<: *smartrent_hex_org
       - run: mix deps.get
       - run: mix format --check-formatted
       - run: mix deps.unlock --check-unused
@@ -52,6 +57,7 @@ jobs:
       - checkout
       - <<: *install_hex_rebar
       - <<: *install_system_deps
+      - <<: *smartrent_hex_org
       - run: mix deps.get
       - run: mix compile
       - run: mix test
