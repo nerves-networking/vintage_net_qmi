@@ -5,8 +5,6 @@ defmodule VintageNetQMI.Indications do
 
   use GenServer
 
-  alias VintageNetQMI.Connectivity
-
   def start_link(args) do
     ifname = Keyword.fetch!(args, :ifname)
 
@@ -34,39 +32,8 @@ defmodule VintageNetQMI.Indications do
 
   @impl GenServer
   def handle_cast({:indication, %{name: :serving_system_indication} = indication}, state) do
-    indication
-    |> connection_from_indication()
-    |> maybe_set_connectivity(state.ifname)
+    VintageNetQMI.Connectivity.serving_system_change(state.ifname, indication)
 
     {:noreply, state}
   end
-
-  defp maybe_set_connectivity(nil, _ifname), do: :ok
-  defp maybe_set_connectivity(status, ifname), do: Connectivity.set_connectivity(ifname, status)
-
-  defp connection_from_indication(%{
-         serving_system_cs_attach_state: :detached,
-         serving_system_ps_attach_state: :detached,
-         serving_system_radio_interfaces: [:no_service],
-         serving_system_registration_state: :not_registered,
-         serving_system_selected_network: :network_unknown
-       }) do
-    :disconnected
-  end
-
-  defp connection_from_indication(%{
-         serving_system_cs_attach_state: :attached,
-         serving_system_ps_attach_state: :attached,
-         serving_system_radio_interfaces: radio_ifs,
-         serving_system_registration_state: :registered,
-         serving_system_selected_network: :network_3gpp
-       }) do
-    if Enum.empty?(radio_ifs) do
-      nil
-    else
-      :internet
-    end
-  end
-
-  defp connection_from_indication(_indication), do: nil
 end

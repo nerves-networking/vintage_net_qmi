@@ -22,6 +22,7 @@ defmodule VintageNetQMITest do
            name: :"Elixir.VintageNetQMI.QMI.wwan0",
            indication_callback: :anonymous_functions_dont_work_for_unit_tests
          ]},
+        {VintageNetQMI.Connectivity, [ifname: "wwan0"]},
         {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
