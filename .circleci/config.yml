@@ -23,9 +23,9 @@ smartrent_hex_org: &smartrent_hex_org
   run: mix hex.organization auth smartrent --key $SMARTRENT_HEX_KEY
 
 jobs:
-  build_elixir_1_11_otp_23:
+  build_elixir_1_12_otp_24:
     docker:
-      - image: hexpm/elixir:1.11.4-erlang-23.3.1-alpine-3.13.3
+      - image: hexpm/elixir:1.12.0-erlang-24.0-alpine-3.13.3
     <<: *defaults
     steps:
       - checkout
@@ -49,9 +49,9 @@ jobs:
             - _build
             - deps
 
-  build_elixir_1_10_otp_23:
+  build_elixir_1_11_otp_23:
     docker:
-      - image: hexpm/elixir:1.10.4-erlang-23.3.1-alpine-3.13.3
+      - image: hexpm/elixir:1.11.4-erlang-23.3.4-alpine-3.13.3
     <<: *defaults
     steps:
       - checkout
@@ -66,5 +66,5 @@ workflows:
   version: 2
   build_test:
     jobs:
+      - build_elixir_1_12_otp_24
       - build_elixir_1_11_otp_23
-      - build_elixir_1_10_otp_23
