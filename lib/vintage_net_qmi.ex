@@ -131,6 +131,7 @@ defmodule VintageNetQMI do
          name: qmi_name(ifname),
          indication_callback: &VintageNetQMI.Indications.handle(ifname, &1)
        ]},
+      {VintageNetQMI.Connectivity, ifname: ifname},
       {VintageNetQMI.Connection,
        [ifname: ifname, service_providers: normalized_config.vintage_net_qmi.service_providers]},
       {VintageNetQMI.CellMonitor, [ifname: ifname]},
