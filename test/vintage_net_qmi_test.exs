@@ -9,7 +9,7 @@ defmodule VintageNetQMITest do
       hostname: "unit_test"
     }
 
-    output = %RawConfig{
+    expected = %RawConfig{
       ifname: "wwan0",
       type: VintageNetQMI,
       source_config: input,
@@ -37,6 +37,20 @@ defmodule VintageNetQMITest do
       ]
     }
 
-    assert output == VintageNetQMI.to_raw_config("wwan0", input, Utils.default_opts())
+    created = VintageNetQMI.to_raw_config("wwan0", input, Utils.default_opts())
+
+    {expected_children, expected_no_children} = Map.pop(expected, :child_specs)
+    {created_children, created_no_children} = Map.pop(created, :child_specs)
+
+    assert expected_no_children == created_no_children
+    assert Enum.all?(Enum.zip(expected_children, created_children), &expected_child?/1)
   end
+
+  defp expected_child?({{QMI.Supervisor, e_opts}, {QMI.Supervisor, c_opts}}) do
+    e_opts[:ifname] == c_opts[:ifname] and e_opts[:name] == c_opts[:name] and
+      is_function(c_opts[:indication_callback])
+  end
+
+  defp expected_child?({same, same}), do: true
+  defp expected_child?(_), do: false
 end
