@@ -4,7 +4,7 @@ defmodule VintageNetQMI.CookbookTest do
   alias VintageNetQMI.Cookbook
 
   test "simple/1" do
-    assert {:ok, %{type: VintageNetQMI, vintage_net_qmi: %{service_providers: [%{apn: "apn"}]}}} ==
+    assert {:ok, %{type: VintageNetQMI, vintage_net_qmi: %{service_providers: [%{apn: "super"}]}}} ==
              Cookbook.simple("super")
   end
 end
