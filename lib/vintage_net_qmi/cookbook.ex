@@ -14,7 +14,7 @@ defmodule VintageNetQMI.Cookbook do
      %{
        type: VintageNetQMI,
        vintage_net_qmi: %{
-         service_providers: [%{apn: "apn"}]
+         service_providers: [%{apn: apn}]
        }
      }}
   end
