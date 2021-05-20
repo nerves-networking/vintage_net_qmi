@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.2
+
+* Improvements
+  * Add `VintageNetQMI.quick_configure/1` to easily configure `VintageNet` at
+    runtime.
+
+* Updates
+  * Support `vintage_net` v0.10.2
+  * Better handling of connection status
+
 ## v0.2.1
 
 * Updates
