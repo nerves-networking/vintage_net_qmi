@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.3
+
+* Fixes
+  * `VintageNetQMI.quick_configure/1` updated to use the passed in argument
+    for the APN instead of always using hardcoded `"apn"` value
+
 ## v0.2.2
 
 * Improvements
