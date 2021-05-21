@@ -26,6 +26,7 @@ defmodule VintageNetQMITest do
         {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
+        {VintageNetQMI.ModemInfo, [ifname: "wwan0"]},
         Utils.udhcpc_child_spec("wwan0", "unit_test")
       ],
       down_cmds: [

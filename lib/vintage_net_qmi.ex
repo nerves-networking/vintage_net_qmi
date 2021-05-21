@@ -135,7 +135,8 @@ defmodule VintageNetQMI do
       {VintageNetQMI.Connection,
        [ifname: ifname, service_providers: normalized_config.vintage_net_qmi.service_providers]},
       {VintageNetQMI.CellMonitor, [ifname: ifname]},
-      {VintageNetQMI.SignalMonitor, [ifname: ifname]}
+      {VintageNetQMI.SignalMonitor, [ifname: ifname]},
+      {VintageNetQMI.ModemInfo, ifname: ifname}
     ]
 
     # QMI uses DHCP to report IP addresses, gateway, DNS, etc.
