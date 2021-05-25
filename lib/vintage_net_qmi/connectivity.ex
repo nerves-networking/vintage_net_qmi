@@ -30,7 +30,7 @@ defmodule VintageNetQMI.Connectivity do
   """
   @spec serving_system_change(String.t(), map()) :: :ok
   def serving_system_change(ifname, serving_system) do
-    GenServer.call(name(ifname), {:serving_system_change, serving_system})
+    GenServer.cast(name(ifname), {:serving_system_change, serving_system})
   end
 
   @impl GenServer
@@ -38,33 +38,35 @@ defmodule VintageNetQMI.Connectivity do
     ifname = Keyword.fetch!(args, :ifname)
 
     VintageNet.subscribe(["interface", ifname, "connection"])
+    VintageNet.subscribe(["interface", ifname, "addresses"])
     connection_status = VintageNet.get(["interface", ifname, "connection"])
+    addresses = VintageNet.get(["interface", ifname, "addresses"])
 
-    if connection_status == :lan && has_address?(ifname) do
-      RouteManager.set_connection_status(ifname, :internet)
-    end
+    state =
+      %{
+        ifname: ifname,
+        # Set the cached status to internet since the logic for updating the
+        # connection status always updates the RouteManager in this state.
+        cached_status: :internet,
+        # The following keep track of all of the conditions that need to be
+        # true for the modem to have internet access
+        lan?: connection_status == :lan or connection_status == :internet,
+        ip_address?: has_ipv4_address?(addresses),
+        serving_system?: true
+      }
+      |> update_connection_status()
 
-    {:ok, %{ifname: ifname}}
+    {:ok, state}
   end
 
   @impl GenServer
-  def handle_call({:serving_system_change, serving_system}, _from, state) do
-    case connection_from_indication(serving_system) do
-      :internet ->
-        # The serving system can be reporting that a connection has happened
-        # DCHP hasn't ran yet, so only set internet if there are IP addresses.
-        if has_address?(state.ifname) do
-          RouteManager.set_connection_status(state.ifname, :internet)
-        end
+  def handle_cast({:serving_system_change, serving_system}, state) do
+    new_state =
+      state
+      |> Map.put(:serving_system?, serving_system_connected?(serving_system))
+      |> update_connection_status()
 
-      :disconnected ->
-        RouteManager.set_connection_status(state.ifname, :disconnected)
-
-      _ ->
-        nil
-    end
-
-    {:reply, :ok, state}
+    {:noreply, new_state}
   end
 
   @impl GenServer
@@ -72,45 +74,58 @@ defmodule VintageNetQMI.Connectivity do
         {VintageNet, ["interface", ifname, "connection"], :disconnected, :lan, _meta},
         %{ifname: ifname} = state
       ) do
-    RouteManager.set_connection_status(ifname, :internet)
+    new_state =
+      state
+      |> Map.put(:lan?, true)
+      |> update_connection_status()
 
-    {:noreply, state}
+    {:noreply, new_state}
+  end
+
+  def handle_info(
+        {VintageNet, ["interface", ifname, "addresses"], _old, addresses, _meta},
+        %{ifname: ifname} = state
+      ) do
+    new_state =
+      state
+      |> Map.put(:ip_address?, has_ipv4_address?(addresses))
+      |> update_connection_status()
+
+    {:noreply, new_state}
   end
 
   def handle_info(_message, state), do: {:noreply, state}
 
-  defp has_address?(ifname) do
-    VintageNet.get(["interface", ifname, "addresses"])
-    |> Enum.any?(&ipv4?/1)
+  defp update_connection_status(%{lan?: true, serving_system?: true, ip_address?: true} = state) do
+    RouteManager.set_connection_status(state.ifname, :internet)
+    %{state | cached_status: :internet}
+  end
+
+  defp update_connection_status(%{cached_status: :internet} = state) do
+    RouteManager.set_connection_status(state.ifname, :disconnected)
+    %{state | cached_status: :disconnected}
+  end
+
+  defp update_connection_status(state), do: state
+
+  defp has_ipv4_address?(addresses) do
+    Enum.any?(addresses, &ipv4?/1)
   end
 
   defp ipv4?(%{family: :inet}), do: true
   defp ipv4?(_), do: false
 
-  defp connection_from_indication(%{
-         serving_system_cs_attach_state: :detached,
-         serving_system_ps_attach_state: :detached,
-         serving_system_radio_interfaces: [:no_service],
-         serving_system_registration_state: :not_registered,
-         serving_system_selected_network: :network_unknown
-       }) do
-    :disconnected
-  end
-
-  defp connection_from_indication(%{
+  defp serving_system_connected?(%{
          serving_system_cs_attach_state: :attached,
          serving_system_ps_attach_state: :attached,
          serving_system_radio_interfaces: radio_ifs,
          serving_system_registration_state: :registered,
          serving_system_selected_network: network
        })
-       when network != :network_unknown do
-    if Enum.empty?(radio_ifs) do
-      nil
-    else
-      :internet
-    end
+       when network != :network_unknown and
+              radio_ifs != [] do
+    true
   end
 
-  defp connection_from_indication(_indication), do: nil
+  defp serving_system_connected?(_indication), do: false
 end
