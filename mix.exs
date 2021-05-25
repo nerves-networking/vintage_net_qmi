@@ -1,7 +1,7 @@
 defmodule VintageNetQMI.MixProject do
   use Mix.Project
 
-  @version "0.2.3"
+  @version "0.2.4"
   @source_url "https://github.com/smartrent/vintage_net_qmi"
 
   def project do

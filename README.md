@@ -15,7 +15,7 @@ To use this library, first add it to your project's dependency list:
 ```elixir
 def deps do
   [
-    {:vintage_net_qmi, "~> 0.2.2"}
+    {:vintage_net_qmi, "~> 0.2.4"}
   ]
 end
 ```
@@ -73,6 +73,7 @@ technology the following:
 | `signal_dbm`  | `-144 - -44`   | The signal level in dBm. Interpretation depends on the connection technology. |
 | `mcc`         | `0-999`        | Mobile Country Code for the network |
 | `mnc`         | `0-999`        | Mobile Network Code for the network |
+| `iccid`       | string         | The Integrated Circuit Card Identifier (ICCID) |
 
 The following properties are TBD:
 
@@ -84,7 +85,6 @@ The following properties are TBD:
 | `access_technology` | string   | The technology currently in use to connect to the network |
 | `band`        | string         | The frequency band in use |
 | `channel`     | integer        | An integer that indicates the channel that's in use |
-| `iccid`       | string         | The Integrated Circuit Card Identifier (ICCID) |
 | `imsi`        | string         | The International Mobile Subscriber Identity (IMSI) |
 
 ## System requirements
