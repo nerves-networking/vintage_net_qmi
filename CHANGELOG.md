@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.4
+
+* Improvements
+  * Support `iccid` property
+
+* Updates
+  * Support `qmi` v0.5.1
+
 ## v0.2.3
 
 * Fixes
