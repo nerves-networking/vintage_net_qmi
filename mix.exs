@@ -2,7 +2,7 @@ defmodule VintageNetQMI.MixProject do
   use Mix.Project
 
   @version "0.2.4"
-  @source_url "https://github.com/smartrent/vintage_net_qmi"
+  @source_url "https://github.com/nerves-networking/vintage_net_qmi"
 
   def project do
     [
@@ -34,7 +34,7 @@ defmodule VintageNetQMI.MixProject do
   defp deps do
     [
       {:vintage_net, "~> 0.10.0"},
-      {:qmi, "~> 0.5.0", organization: "smartrent"},
+      {:qmi, "~> 0.5.1"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
@@ -67,8 +67,7 @@ defmodule VintageNetQMI.MixProject do
         "README.md"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url},
-      organization: "smartrent"
+      links: %{"GitHub" => @source_url}
     ]
   end
 end
