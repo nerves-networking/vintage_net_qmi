@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.5
+
+* Updates
+  * Support `qmi` v0.6.0
+
 ## v0.2.4
 
 * Improvements
