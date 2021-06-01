@@ -65,7 +65,8 @@ defmodule VintageNetQMI.Connectivity do
         # The packet data connection status reported from QMI. Being connected
         # does not mean that the IP address has been assigned only that
         # IP address configuration can commence.
-        packet_data_connection: :disconnected
+        packet_data_connection: :disconnected,
+        cached_status_timestamp: :erlang.monotonic_time()
       }
       |> update_connection_status()
 
@@ -166,16 +167,44 @@ defmodule VintageNetQMI.Connectivity do
            packet_data_connection: :connected
          } = state
        ) do
-    RouteManager.set_connection_status(state.ifname, :internet)
+    new_connection = :internet
+
+    RouteManager.set_connection_status(state.ifname, new_connection)
+    state = execute_telemetry_events(new_connection, state)
+
     %{state | cached_status: :internet}
   end
 
   defp update_connection_status(%{cached_status: :internet} = state) do
-    RouteManager.set_connection_status(state.ifname, :disconnected)
-    %{state | cached_status: :disconnected}
+    new_connection = :disconnected
+
+    RouteManager.set_connection_status(state.ifname, new_connection)
+    state = execute_telemetry_events(new_connection, state)
+
+    %{state | cached_status: new_connection}
   end
 
   defp update_connection_status(state), do: state
+
+  defp execute_telemetry_events(connection, %{cached_status: connection} = state), do: state
+
+  defp execute_telemetry_events(new_connection, state) do
+    cached_status_timestamp = :erlang.monotonic_time()
+
+    :telemetry.execute(
+      [:vintage_net_qmi, :connection, :end],
+      %{duration: :erlang.monotonic_time() - state.cached_status_timestamp},
+      %{ifname: state.ifname, status: state.cached_status}
+    )
+
+    :telemetry.execute(
+      [:vintage_net_qmi, :connection],
+      %{},
+      %{ifname: state.ifname, status: new_connection}
+    )
+
+    %{state | cached_status_timestamp: cached_status_timestamp}
+  end
 
   defp has_ipv4_address?(nil), do: false
 

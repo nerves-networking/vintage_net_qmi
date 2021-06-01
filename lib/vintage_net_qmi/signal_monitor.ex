@@ -59,7 +59,9 @@ defmodule VintageNetQMI.SignalMonitor do
 
     rssi_data
     |> to_rssi()
-    |> post_signal_rssi(state.ifname)
+    |> Map.put(:rssi, rssi_data.rssi)
+    |> post_signal_rssi(state)
+    |> execute_telemetry_event(state)
   end
 
   defp to_rssi(%{rssi: rssi}) do
@@ -91,5 +93,13 @@ defmodule VintageNetQMI.SignalMonitor do
 
   defp send_msgs(messages, interval) do
     Enum.each(messages, &Process.send_after(self(), &1, interval))
+  end
+
+  defp execute_telemetry_event(signal_measurements, state) do
+    :telemetry.execute(
+      [:vintage_net_qmi, :signal_strength],
+      signal_measurements,
+      %{ifname: state.ifname}
+    )
   end
 end
