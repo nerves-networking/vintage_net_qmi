@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.6
+
+* Fixes
+  * Fix lease renewal ending in stuck lan connectivity
+
 ## v0.2.5
 
 * Updates
