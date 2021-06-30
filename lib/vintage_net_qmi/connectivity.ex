@@ -71,7 +71,7 @@ defmodule VintageNetQMI.Connectivity do
 
   @impl GenServer
   def handle_info(
-        {VintageNet, ["interface", ifname, "connection"], :disconnected, :lan, _meta},
+        {VintageNet, ["interface", ifname, "connection"], _, :lan, _meta},
         %{ifname: ifname} = state
       ) do
     new_state =
