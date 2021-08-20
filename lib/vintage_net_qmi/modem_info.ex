@@ -12,7 +12,7 @@ defmodule VintageNetQMI.ModemInfo do
 
   require Logger
 
-  alias QMI.UserIdentity
+  alias QMI.{DeviceManagement, UserIdentity}
   alias VintageNet.PropertyTable
 
   @type init_arg() :: {:ifname, String.t()}
@@ -29,8 +29,10 @@ defmodule VintageNetQMI.ModemInfo do
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
     send(self(), :get_iccid)
+    send(self(), :get_manufacturer)
+    send(self(), :get_model)
 
-    {:ok, %{ifname: ifname}}
+    {:ok, %{ifname: ifname, manufacturer: nil, model: nil, ccid: nil}}
   end
 
   @impl GenServer
@@ -41,12 +43,59 @@ defmodule VintageNetQMI.ModemInfo do
       {:ok, read_response} ->
         iccid = UserIdentity.parse_iccid(read_response.read_result)
         PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "iccid"], iccid)
-        {:stop, :normal, state}
+        reply_value(%{state | ccid: iccid})
 
       {:error, reason} ->
         Logger.warn("[VintageNetQMI] unable to get CCID for #{inspect(reason)}")
-        Process.send_after(self(), :get_iccid, 1_000)
-        {:noreply, state}
+        retry_after(:get_ccid, 1_000)
+        reply_value(state)
+    end
+  end
+
+  def handle_info(:get_manufacturer, state) do
+    qmi = VintageNetQMI.qmi_name(state.ifname)
+
+    case DeviceManagement.get_manufacturer(qmi) do
+      {:ok, manufacturer} ->
+        PropertyTable.put(
+          VintageNet,
+          ["interface", state.ifname, "mobile", "manufacturer"],
+          manufacturer
+        )
+
+        reply_value(%{state | manufacturer: manufacturer})
+
+      {:error, reason} ->
+        Logger.warn("[VintageNetQMI] unable to get manufacturer for #{inspect(reason)}")
+        retry_after(:get_manufacturer, 1_200)
+        reply_value(state)
+    end
+  end
+
+  def handle_info(:get_model, state) do
+    qmi = VintageNetQMI.qmi_name(state.ifname)
+
+    case DeviceManagement.get_model(qmi) do
+      {:ok, model} ->
+        PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "model"], model)
+        reply_value(%{state | model: model})
+
+      {:error, reason} ->
+        Logger.warn("[VintageNetQMI] unable to get model for #{inspect(reason)}")
+        retry_after(:get_model, 1_500)
+        reply_value(state)
+    end
+  end
+
+  defp retry_after(message, wait) do
+    Process.send_after(self(), message, wait)
+  end
+
+  defp reply_value(state) do
+    if Enum.any?(Map.values(state), &(&1 == nil)) do
+      {:noreply, state}
+    else
+      {:stop, :normal, state}
     end
   end
 
