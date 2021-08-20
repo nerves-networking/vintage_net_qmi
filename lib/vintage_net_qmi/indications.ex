@@ -5,6 +5,8 @@ defmodule VintageNetQMI.Indications do
 
   use GenServer
 
+  require Logger
+
   def start_link(args) do
     ifname = Keyword.fetch!(args, :ifname)
 
@@ -34,6 +36,11 @@ defmodule VintageNetQMI.Indications do
   def handle_cast({:indication, %{name: :serving_system_indication} = indication}, state) do
     VintageNetQMI.Connectivity.serving_system_change(state.ifname, indication)
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:indication, indication}, state) do
+    Logger.info("VintageNetQMI: ignoring indication: #{inspect(indication)}")
     {:noreply, state}
   end
 end
