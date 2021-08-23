@@ -33,7 +33,7 @@ defmodule VintageNetQMI.MixProject do
 
   defp deps do
     [
-      {:vintage_net, "~> 0.10.0"},
+      {:vintage_net, "~> 0.11.0"},
       {:qmi, "~> 0.6.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
