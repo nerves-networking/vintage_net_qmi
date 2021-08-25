@@ -39,6 +39,11 @@ defmodule VintageNetQMI.Indications do
     {:noreply, state}
   end
 
+  def handle_cast({:indication, %{name: :packet_status_indication} = indication}, state) do
+    VintageNetQMI.Connectivity.connection_status_change(state.ifname, indication)
+    {:noreply, state}
+  end
+
   def handle_cast({:indication, indication}, state) do
     Logger.info("VintageNetQMI: ignoring indication: #{inspect(indication)}")
     {:noreply, state}
