@@ -33,6 +33,14 @@ defmodule VintageNetQMI.Connectivity do
     GenServer.cast(name(ifname), {:serving_system_change, serving_system})
   end
 
+  @doc """
+  Report a packet data connection status change
+  """
+  @spec connection_status_change(String.t(), map()) :: :ok
+  def connection_status_change(ifname, connection_status) do
+    GenServer.cast(name(ifname), {:connection_status_change, connection_status})
+  end
+
   @impl GenServer
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
@@ -52,7 +60,11 @@ defmodule VintageNetQMI.Connectivity do
         # true for the modem to have internet access
         lan?: connection_status == :lan or connection_status == :internet,
         ip_address?: has_ipv4_address?(addresses),
-        serving_system?: true
+        serving_system?: true,
+        # The packet data connection status reported from QMI. Being connected
+        # does not mean that the IP address has been assigned only that
+        # IP address configuration can commence.
+        packet_data_connection: :disconnected
       }
       |> update_connection_status()
 
@@ -64,6 +76,15 @@ defmodule VintageNetQMI.Connectivity do
     new_state =
       state
       |> Map.put(:serving_system?, serving_system_connected?(serving_system))
+      |> update_connection_status()
+
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:connection_status_change, connection_status}, state) do
+    new_state =
+      state
+      |> Map.put(:packet_data_connection, connection_status.status)
       |> update_connection_status()
 
     {:noreply, new_state}
@@ -96,7 +117,14 @@ defmodule VintageNetQMI.Connectivity do
 
   def handle_info(_message, state), do: {:noreply, state}
 
-  defp update_connection_status(%{lan?: true, serving_system?: true, ip_address?: true} = state) do
+  defp update_connection_status(
+         %{
+           lan?: true,
+           serving_system?: true,
+           ip_address?: true,
+           packet_data_connection: :connected
+         } = state
+       ) do
     RouteManager.set_connection_status(state.ifname, :internet)
     %{state | cached_status: :internet}
   end
