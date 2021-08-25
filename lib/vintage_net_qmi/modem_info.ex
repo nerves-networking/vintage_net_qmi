@@ -12,7 +12,7 @@ defmodule VintageNetQMI.ModemInfo do
 
   require Logger
 
-  alias QMI.UserIdentity
+  alias QMI.{DeviceManagement, UserIdentity}
   alias VintageNet.PropertyTable
 
   @type init_arg() :: {:ifname, String.t()}
@@ -29,25 +29,69 @@ defmodule VintageNetQMI.ModemInfo do
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
     send(self(), :get_iccid)
+    send(self(), :get_serial_numbers)
 
-    {:ok, %{ifname: ifname}}
+    {:ok, %{ifname: ifname, iccid: false, serial_numbers: false}}
   end
 
   @impl GenServer
+  def handle_info(:get_serial_numbers, state) do
+    qmi = VintageNetQMI.qmi_name(state.ifname)
+
+    case DeviceManagement.get_serial_numbers(qmi) do
+      {:ok, serial_numbers} ->
+        put_serial_numbers(serial_numbers, state)
+        return_value(%{state | serial_numbers: true})
+
+      {:error, reason} ->
+        Logger.warn("[VintageNetQMI] unable to get serial numbers for #{inspect(reason)}")
+        retry_and_return(:get_serial_numbers, state)
+    end
+  end
+
   def handle_info(:get_iccid, state) do
     qmi = VintageNetQMI.qmi_name(state.ifname)
 
     case UserIdentity.read_transparent(qmi, @iccid_file_id, @main_file_path) do
       {:ok, read_response} ->
         iccid = UserIdentity.parse_iccid(read_response.read_result)
-        PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "iccid"], iccid)
-        {:stop, :normal, state}
+        property_table_put("iccid", iccid, state)
+        return_value(%{state | iccid: true})
 
       {:error, reason} ->
         Logger.warn("[VintageNetQMI] unable to get CCID for #{inspect(reason)}")
-        Process.send_after(self(), :get_iccid, 1_000)
-        {:noreply, state}
+        retry_and_return(:get_iccid, state)
     end
+  end
+
+  defp put_serial_numbers(serial_numbers, state) do
+    Enum.each(serial_numbers, fn
+      {serial_number_name, serial_number} ->
+        serial_number_name
+        |> Atom.to_string()
+        |> property_table_put(serial_number, state)
+    end)
+  end
+
+  defp property_table_put(property, value, state) do
+    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", property], value)
+  end
+
+  defp retry_and_return(name, state) do
+    retry(name)
+    return_value(state)
+  end
+
+  defp return_value(%{iccid: true, serial_numbers: true} = state) do
+    {:stop, :normal, state}
+  end
+
+  defp return_value(state) do
+    {:noreply, state}
+  end
+
+  defp retry(name) do
+    Process.send_after(self(), name, 1_000)
   end
 
   @impl GenServer

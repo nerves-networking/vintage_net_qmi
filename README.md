@@ -74,6 +74,10 @@ technology the following:
 | `mcc`         | `0-999`        | Mobile Country Code for the network |
 | `mnc`         | `0-999`        | Mobile Network Code for the network |
 | `iccid`       | string         | The Integrated Circuit Card Identifier (ICCID) |
+| `esn`         | string         | The Electronic Serial Number (ESN) |
+| `imei`        | string         | International Mobile Equipment Identity (IMEI) |
+| `meid`        | string         | The Mobile Equipment Identifier (MEID) |
+| `imeisv_svn`  | string         | IMEI software version number |
 
 The following properties are TBD:
 
