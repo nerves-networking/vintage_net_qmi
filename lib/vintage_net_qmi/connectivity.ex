@@ -3,6 +3,7 @@ defmodule VintageNetQMI.Connectivity do
 
   use GenServer
 
+  alias VintageNet.PowerManager.PMControl
   alias VintageNet.RouteManager
 
   @typedoc """
@@ -68,6 +69,8 @@ defmodule VintageNetQMI.Connectivity do
       }
       |> update_connection_status()
 
+    _ = :timer.send_interval(60, :check_connectivity)
+
     {:ok, state}
   end
 
@@ -113,6 +116,14 @@ defmodule VintageNetQMI.Connectivity do
       |> update_connection_status()
 
     {:noreply, new_state}
+  end
+
+  def handle_info(:check_connectivity, state) do
+    if state.cached_status == :internet do
+      PMControl.pet_watchdog(state.ifname)
+    end
+
+    {:noreply, state}
   end
 
   def handle_info(_message, state), do: {:noreply, state}
