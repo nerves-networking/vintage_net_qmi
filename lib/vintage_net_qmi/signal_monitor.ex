@@ -4,12 +4,12 @@ defmodule VintageNetQMI.SignalMonitor do
   use GenServer
 
   alias QMI.NetworkAccess
-  alias VintageNet.PowerManager.PMControl
   alias VintageNet.PropertyTable
   alias VintageNetQMI.ASUCalculator
 
   @type opt() :: {:ifname, binary()} | {:interval, non_neg_integer()}
 
+  @spec start_link([opt()]) :: GenServer.on_start()
   def start_link(args) do
     GenServer.start_link(__MODULE__, args)
   end
@@ -44,17 +44,11 @@ defmodule VintageNetQMI.SignalMonitor do
 
     rssi_data
     |> to_rssi()
-    |> maybe_pet_power_control(state.ifname)
     |> post_signal_rssi(state.ifname)
   end
 
   defp to_rssi(%{rssi: rssi}) do
     ASUCalculator.from_lte_rssi(rssi)
-  end
-
-  defp maybe_pet_power_control(%{bars: bars} = report, ifname) when bars > 0 do
-    PMControl.pet_watchdog(ifname)
-    report
   end
 
   defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars}, ifname) do
