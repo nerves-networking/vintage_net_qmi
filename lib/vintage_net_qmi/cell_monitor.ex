@@ -60,9 +60,15 @@ defmodule VintageNetQMI.CellMonitor do
     {:noreply, state}
   end
 
-  defp maybe_post_home_network({:ok, %{mcc: mcc, mnc: mnc}}, state) do
-    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mcc"], mcc)
-    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mnc"], mnc)
+  defp maybe_post_home_network({:ok, home_network}, state) do
+    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mcc"], home_network.mcc)
+    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mnc"], home_network.mnc)
+
+    PropertyTable.put(
+      VintageNet,
+      ["interface", state.ifname, "mobile", "provider"],
+      home_network.provider
+    )
 
     state
   end

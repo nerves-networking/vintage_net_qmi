@@ -78,6 +78,7 @@ technology the following:
 | `imei`        | string         | International Mobile Equipment Identity (IMEI) |
 | `meid`        | string         | The Mobile Equipment Identifier (MEID) |
 | `imeisv_svn`  | string         | IMEI software version number |
+| `provider`    | string         | The name of the service provider |
 
 The following properties are TBD:
 
