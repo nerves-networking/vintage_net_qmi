@@ -79,14 +79,17 @@ technology the following:
 | `meid`        | string         | The Mobile Equipment Identifier (MEID) |
 | `imeisv_svn`  | string         | IMEI software version number |
 | `provider`    | string         | The name of the service provider |
+| `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
+| `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
+| `network_datetime` | `NaiveDateTime.t()` | The reported datetime from the network |
+| `timezone_offset` | `Calendar.utc_offset()` | The UTC offset in seconds |
+| `roaming`     | `boolean()`    | If the network is roaming or not |
+| `daylight_saving_adjustment` | `Calendar.std_offset()` | The standard offset in seconds |
 
 The following properties are TBD:
 
 | Property      | Values         | Description                   |
 | ------------- | -------------- | ----------------------------- |
-| `network`     | string         | The network operator's name |
-| `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
-| `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
 | `access_technology` | string   | The technology currently in use to connect to the network |
 | `band`        | string         | The frequency band in use |
 | `channel`     | integer        | An integer that indicates the channel that's in use |
