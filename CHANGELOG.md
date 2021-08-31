@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.7
+
+* Added
+  * Support `VintageNet` v0.11.x
+  * Serial number properties:
+    * `esn` - Electronic Serial Number (ESN)
+    * `imei` - International Mobile Equipment Identity (IMEI)
+    * `meid` - Mobile Equipment Identifier (MEID)
+    * `imeisv_svn` - IMEI software version number
+  * The `provider` property to get the service provider name
+
+* Fixes
+  * When packet data connection is disconnected set the connection status to
+    `:disconnected`
+  * Check connectivity status to know if the modem should power cycle
+
 ## v0.2.6
 
 * Fixes
