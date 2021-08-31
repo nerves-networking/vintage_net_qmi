@@ -4,7 +4,7 @@ defmodule VintageNetQMI.Connectivity do
   use GenServer
 
   alias VintageNet.PowerManager.PMControl
-  alias VintageNet.RouteManager
+  alias VintageNet.{PropertyTable, RouteManager}
 
   @typedoc """
   Connectivity server initial arguments
@@ -81,6 +81,8 @@ defmodule VintageNetQMI.Connectivity do
       |> Map.put(:serving_system?, serving_system_connected?(serving_system))
       |> update_connection_status()
 
+    update_time_location_properties(serving_system, state)
+
     {:noreply, new_state}
   end
 
@@ -92,6 +94,32 @@ defmodule VintageNetQMI.Connectivity do
 
     {:noreply, new_state}
   end
+
+  defp update_time_location_properties(serving_system, state) do
+    fields = [
+      :cell_id,
+      :location_area_code,
+      :network_datetime,
+      :roaming,
+      :timezone_offset,
+      :daylight_saving_adjustment
+    ]
+
+    Enum.each(fields, &maybe_update_time_location_property(serving_system, &1, state))
+  end
+
+  defp maybe_update_time_location_property(serving_system, field, state) do
+    if value = serving_system[field] do
+      prop_name = prop_name_for_serving_system_field(field)
+      PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", prop_name], value)
+    end
+
+    :ok
+  end
+
+  defp prop_name_for_serving_system_field(:location_area_code), do: "lac"
+  defp prop_name_for_serving_system_field(:cell_id), do: "cid"
+  defp prop_name_for_serving_system_field(other), do: Atom.to_string(other)
 
   @impl GenServer
   def handle_info(
