@@ -101,8 +101,8 @@ defmodule VintageNetQMI.Connectivity do
       :location_area_code,
       :network_datetime,
       :roaming,
-      :timezone_offset,
-      :daylight_saving_adjustment
+      :utc_offset,
+      :std_offset
     ]
 
     Enum.each(fields, &maybe_update_time_location_property(serving_system, &1, state))
