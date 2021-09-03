@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.8
+
+* Added
+  * Location and time properties:
+    * `lac` - The Location Area Code (lac) for the current cell
+    * `cid` - The Cell ID (cid) for the current cell
+    * `network_datetime` - The reported datetime from the network
+    * `utc_offset` - The UTC offset in seconds
+    * `roaming` - If the network is roaming or not
+    * `std_offset` - The standard offset in seconds
+
 ## v0.2.7
 
 * Added
