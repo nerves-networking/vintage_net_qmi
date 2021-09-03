@@ -82,9 +82,9 @@ technology the following:
 | `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
 | `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
 | `network_datetime` | `NaiveDateTime.t()` | The reported datetime from the network |
-| `timezone_offset` | `Calendar.utc_offset()` | The UTC offset in seconds |
+| `utc_offset`  | `Calendar.utc_offset()` | The UTC offset in seconds |
 | `roaming`     | `boolean()`    | If the network is roaming or not |
-| `daylight_saving_adjustment` | `Calendar.std_offset()` | The standard offset in seconds |
+| `std_offset`  | `Calendar.std_offset()` | The standard offset in seconds |
 
 The following properties are TBD:
 
