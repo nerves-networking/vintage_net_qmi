@@ -44,6 +44,11 @@ defmodule VintageNetQMI.Indications do
     {:noreply, state}
   end
 
+  def handle_cast({:indication, %{name: :event_report_indication} = indication}, state) do
+    VintageNetQMI.Connection.process_stats(state.ifname, indication)
+    {:noreply, state}
+  end
+
   def handle_cast({:indication, indication}, state) do
     Logger.info("VintageNetQMI: ignoring indication: #{inspect(indication)}")
     {:noreply, state}
