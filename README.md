@@ -85,6 +85,7 @@ technology the following:
 | `utc_offset`  | `Calendar.utc_offset()` | The UTC offset in seconds |
 | `roaming`     | `boolean()`    | If the network is roaming or not |
 | `std_offset`  | `Calendar.std_offset()` | The standard offset in seconds |
+| `statistics`  | map            | Transmit and receive statistics (see below for details) |
 
 The following properties are TBD:
 
@@ -94,6 +95,21 @@ The following properties are TBD:
 | `band`        | string         | The frequency band in use |
 | `channel`     | integer        | An integer that indicates the channel that's in use |
 | `imsi`        | string         | The International Mobile Subscriber Identity (IMSI) |
+
+### Transmit and receive statistics
+
+The `statistics` value is a map with the fields:
+
+* `:tx_bytes` - total bytes transmitted
+* `:rx_bytes` - total bytes received
+* `:tx_packets` - total packets transmitted without error
+* `:rx_packets` - total packets received without error
+* `:tx_errors` - total outgoing packets with framing errors
+* `:rx_errors` - total incoming packets with framing errors
+* `:tx_overflows` - total outing packets dropped due to buffer overflows
+* `:rx_overflows` - total incoming packets dropped due to buffer overflows
+* `:tx_drops` - total outgoing packets dropped
+* `:rx_drops` - total incoming packets dropped
 
 ## System requirements
 
