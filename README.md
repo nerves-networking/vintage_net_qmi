@@ -86,14 +86,14 @@ technology the following:
 | `roaming`     | `boolean()`    | If the network is roaming or not |
 | `std_offset`  | `Calendar.std_offset()` | The standard offset in seconds |
 | `statistics`  | map            | Transmit and receive statistics (see below for details) |
+| `access_technology` | atom     | The technology currently in use to connect to the network |
+| `band`        | string         | The frequency band in use |
+| `channel`     | integer        | An integer that indicates the channel that's in use |
 
 The following properties are TBD:
 
 | Property      | Values         | Description                   |
 | ------------- | -------------- | ----------------------------- |
-| `access_technology` | string   | The technology currently in use to connect to the network |
-| `band`        | string         | The frequency band in use |
-| `channel`     | integer        | An integer that indicates the channel that's in use |
 | `imsi`        | string         | The International Mobile Subscriber Identity (IMSI) |
 
 ### Transmit and receive statistics
@@ -110,6 +110,15 @@ The `statistics` value is a map with the fields:
 * `:rx_overflows` - total incoming packets dropped due to buffer overflows
 * `:tx_drops` - total outgoing packets dropped
 * `:rx_drops` - total incoming packets dropped
+
+### Types of radio access technologies
+
+* `:amps` - Advanced Mobile Phone System (legacy)
+* `:gsm` - Global System for Mobile Communication (3G & 2G)
+* `:umts` - Universal Mobile Telecommunications System (3G)
+* `:lte` - Long-Term Evolution (4G)
+* `:cdma_1x` - CDMA2000 1X (3G & 2G)
+* `:cdma_1x_evdo` - CDMA2000 1xEV-DO (3G & 2G)
 
 ## System requirements
 
