@@ -120,6 +120,9 @@ The `statistics` value is a map with the fields:
 * `:cdma_1x` - CDMA2000 1X (3G & 2G)
 * `:cdma_1x_evdo` - CDMA2000 1xEV-DO (3G & 2G)
 
+If you migrating from `VintageNetMobile` you will need to update any code that
+uses this property to handle the above list of atoms.
+
 ## System requirements
 
 These requirements are believed to be the minimum needed to be added to the
