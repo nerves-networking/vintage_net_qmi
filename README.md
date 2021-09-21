@@ -100,6 +100,7 @@ The following properties are TBD:
 
 The `statistics` value is a map with the fields:
 
+* `:timestamp` - the monotonic time for when these stats where last updated
 * `:tx_bytes` - total bytes transmitted
 * `:rx_bytes` - total bytes received
 * `:tx_packets` - total packets transmitted without error
