@@ -1,7 +1,7 @@
 defmodule VintageNetQMI.MixProject do
   use Mix.Project
 
-  @version "0.2.8"
+  @version "0.2.9"
   @source_url "https://github.com/nerves-networking/vintage_net_qmi"
 
   def project do
@@ -34,7 +34,7 @@ defmodule VintageNetQMI.MixProject do
   defp deps do
     [
       {:vintage_net, "~> 0.10.0 or ~> 0.11.0"},
-      {:qmi, "~> 0.8.0"},
+      {:qmi, "~> 0.8.1"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
