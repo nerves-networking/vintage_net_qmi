@@ -74,7 +74,14 @@ defmodule VintageNetQMI.Connection do
 
   @impl GenServer
   def handle_cast({:process_stats, stats}, state) do
-    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "statistics"], stats)
+    timestamp = System.monotonic_time()
+    stats_with_timestamp = Map.put(stats, :timestamp, timestamp)
+
+    PropertyTable.put(
+      VintageNet,
+      ["interface", state.ifname, "mobile", "statistics"],
+      stats_with_timestamp
+    )
 
     {:noreply, state}
   end
