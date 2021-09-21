@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.2.9] - 2021-09-21
+
+### Added
+
+* Property named `"statistics"` that contains a map of transmit and receive
+  stats. The fields are:
+  * `:timestamp` - monotonic time for when the stats were last updated
+  * `:tx_bytes` - total bytes transmitted
+  * `:rx_bytes` - total bytes received
+  * `:tx_packets` - total packets transmitted without error
+  * `:rx_packets` - total packets received without error
+  * `:tx_errors` - total outgoing packets with framing errors
+  * `:rx_errors` - total incoming packets with framing errors
+  * `:tx_overflows` - total outing packets dropped due to buffer overflows
+  * `:rx_overflows` - total incoming packets dropped due to buffer overflows
+  * `:tx_drops` - total outgoing packets dropped
+  * `:rx_drops` - total incoming packets dropped
+* Property `"band"` for the frequency band being used by the radio interface
+* Property `"channel"` for the channel being used by the radio interface
+* Property `"access_technology"` for the radio interface that is active
+
 ## v0.2.8
 
 * Added
@@ -93,3 +114,5 @@
 ## v0.1.0
 
 Initial Release
+
+[v0.2.9]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.8...v0.2.9
