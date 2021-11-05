@@ -175,6 +175,8 @@ defmodule VintageNetQMI.Connectivity do
 
   defp update_connection_status(state), do: state
 
+  defp has_ipv4_address?(nil), do: false
+
   defp has_ipv4_address?(addresses) do
     Enum.any?(addresses, &ipv4?/1)
   end
