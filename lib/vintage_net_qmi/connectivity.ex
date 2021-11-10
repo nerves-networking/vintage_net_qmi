@@ -69,7 +69,7 @@ defmodule VintageNetQMI.Connectivity do
       }
       |> update_connection_status()
 
-    _ = :timer.send_interval(60, :check_connectivity)
+    _ = :timer.send_interval(30_000, :check_connectivity)
 
     {:ok, state}
   end
