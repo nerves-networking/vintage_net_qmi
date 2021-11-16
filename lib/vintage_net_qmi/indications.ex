@@ -49,6 +49,11 @@ defmodule VintageNetQMI.Indications do
     {:noreply, state}
   end
 
+  def handle_cast({:indication, %{name: :sync_indication}}, state) do
+    # Silently ignore sync indications
+    {:noreply, state}
+  end
+
   def handle_cast({:indication, indication}, state) do
     Logger.info("VintageNetQMI: ignoring indication: #{inspect(indication)}")
     {:noreply, state}
