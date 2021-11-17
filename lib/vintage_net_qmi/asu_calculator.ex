@@ -81,7 +81,8 @@ defmodule VintageNetQMI.ASUCalculator do
   defp lte_rssi_to_bars(rssi) when rssi > -65, do: 4
   defp lte_rssi_to_bars(rssi) when rssi > -75, do: 3
   defp lte_rssi_to_bars(rssi) when rssi > -85, do: 2
-  defp lte_rssi_to_bars(_rssi), do: 1
+  defp lte_rssi_to_bars(rssi) when rssi > -113, do: 1
+  defp lte_rssi_to_bars(_rssi), do: 0
 
   # Clamp ASU to the allowed values
   defp clamp_gsm_asu(asu) when asu < 0, do: 0
