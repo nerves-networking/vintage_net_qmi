@@ -20,7 +20,7 @@ defmodule VintageNetQMITest do
          [
            ifname: "wwan0",
            name: :"Elixir.VintageNetQMI.QMI.wwan0",
-           indication_callback: :anonymous_functions_dont_work_for_unit_tests
+           indication_callback: VintageNetQMI.indication_callback("wwan0")
          ]},
         {VintageNetQMI.Connectivity, [ifname: "wwan0"]},
         {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
@@ -41,18 +41,6 @@ defmodule VintageNetQMITest do
 
     created = VintageNetQMI.to_raw_config("wwan0", input, Utils.default_opts())
 
-    {expected_children, expected_no_children} = Map.pop(expected, :child_specs)
-    {created_children, created_no_children} = Map.pop(created, :child_specs)
-
-    assert expected_no_children == created_no_children
-    assert Enum.all?(Enum.zip(expected_children, created_children), &expected_child?/1)
+    assert created == expected
   end
-
-  defp expected_child?({{QMI.Supervisor, e_opts}, {QMI.Supervisor, c_opts}}) do
-    e_opts[:ifname] == c_opts[:ifname] and e_opts[:name] == c_opts[:name] and
-      is_function(c_opts[:indication_callback])
-  end
-
-  defp expected_child?({same, same}), do: true
-  defp expected_child?(_), do: false
 end

@@ -129,7 +129,7 @@ defmodule VintageNetQMI do
        [
          ifname: ifname,
          name: qmi_name(ifname),
-         indication_callback: &VintageNetQMI.Indications.handle(ifname, &1)
+         indication_callback: indication_callback(ifname)
        ]},
       {VintageNetQMI.Connectivity, ifname: ifname},
       {VintageNetQMI.Connection,
@@ -159,8 +159,12 @@ defmodule VintageNetQMI do
 
   defp remove_connectivity_detector(raw_config) do
     new_child_specs =
-      Enum.filter(raw_config.child_specs, fn spec ->
-        !match?({VintageNet.Interface.InternetConnectivityChecker, _ifname}, spec)
+      Enum.reject(raw_config.child_specs, fn
+        # Old internet connectivity checker module
+        {VintageNet.Interface.InternetConnectivityChecker, _ifname} -> true
+        # New internet connectivity checker module
+        {VintageNet.Connectivity.InternetChecker, _ifname} -> true
+        _ -> false
       end)
 
     %{raw_config | child_specs: new_child_specs}
@@ -185,5 +189,12 @@ defmodule VintageNetQMI do
     with {:ok, config} <- Cookbook.simple(apn) do
       VintageNet.configure("wwan0", config)
     end
+  end
+
+  # For unit test purposes
+  @doc false
+  @spec indication_callback(VintageNet.ifname()) :: function()
+  def indication_callback(ifname) do
+    &VintageNetQMI.Indications.handle(ifname, &1)
   end
 end
