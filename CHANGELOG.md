@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.2.10] - 2021-11-17
+
+### Changes
+
+- Power manager timer was petting the watch dog every 60 miliseconds, now it
+  will pet the watch dog every 30 seconds.
+- Ignore sync indications from QMI so they are not logged.
+
+### Fixes
+
+- A crash that happened when the interface would stop but there was no IP
+  address on the interface.
+- Internet connectivity checker being enabled when it should not have been
+
 ## [v0.2.9] - 2021-09-21
 
 ### Added
