@@ -15,7 +15,7 @@ defmodule VintageNetQMI.ModemInfo do
   alias QMI.{DeviceManagement, UserIdentity}
   alias VintageNet.PropertyTable
 
-  @type init_arg() :: {:ifname, String.t()}
+  @type init_arg() :: {:ifname, VintageNet.ifname()}
 
   @doc """
   Start the ModemInfo server

@@ -20,7 +20,7 @@ defmodule VintageNetQMI.Indications do
   @doc """
   Handle an incoming indication for a interface
   """
-  @spec handle(String.t(), map()) :: :ok
+  @spec handle(VintageNet.ifname(), map()) :: :ok
   def handle(ifname, indication) do
     GenServer.cast(name(ifname), {:indication, indication})
   end
