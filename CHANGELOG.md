@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.2.11] - 2021-11-18
+
+### Fixes
+
+- When there is no signal VintageNetQMI would report 1 bar of signal rather than
+  0 bars
+
 ## [v0.2.10] - 2021-11-17
 
 ### Changes
