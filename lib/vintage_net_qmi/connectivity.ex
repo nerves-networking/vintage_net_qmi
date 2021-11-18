@@ -11,7 +11,7 @@ defmodule VintageNetQMI.Connectivity do
 
   * `:ifname` - the interface name the connectivity server will manage
   """
-  @type init_arg() :: {:ifname, String.t()}
+  @type init_arg() :: {:ifname, VintageNet.ifname()}
 
   @doc """
   Start the Connectivity server
@@ -29,7 +29,7 @@ defmodule VintageNetQMI.Connectivity do
   @doc """
   Report a serving system change to the connectivity server
   """
-  @spec serving_system_change(String.t(), map()) :: :ok
+  @spec serving_system_change(VintageNet.ifname(), map()) :: :ok
   def serving_system_change(ifname, serving_system) do
     GenServer.cast(name(ifname), {:serving_system_change, serving_system})
   end
@@ -37,7 +37,7 @@ defmodule VintageNetQMI.Connectivity do
   @doc """
   Report a packet data connection status change
   """
-  @spec connection_status_change(String.t(), map()) :: :ok
+  @spec connection_status_change(VintageNet.ifname(), map()) :: :ok
   def connection_status_change(ifname, connection_status) do
     GenServer.cast(name(ifname), {:connection_status_change, connection_status})
   end

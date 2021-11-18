@@ -37,7 +37,7 @@ defmodule VintageNetQMI.Connection do
 
   This will post the updated stats as properties.
   """
-  @spec process_stats(String.t(), map()) :: :ok
+  @spec process_stats(VintageNet.ifname(), map()) :: :ok
   def process_stats(ifname, event_report_indication) do
     stats = Map.drop(event_report_indication, [:name])
     GenServer.cast(name(ifname), {:process_stats, stats})
