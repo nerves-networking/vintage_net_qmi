@@ -30,8 +30,11 @@ defmodule VintageNetQMI.ModemInfo do
     ifname = Keyword.fetch!(args, :ifname)
     send(self(), :get_iccid)
     send(self(), :get_serial_numbers)
+    send(self(), :get_model)
+    send(self(), :get_manufacture)
 
-    {:ok, %{ifname: ifname, iccid: false, serial_numbers: false}}
+    {:ok,
+     %{ifname: ifname, iccid: false, serial_numbers: false, model: false, manufacture: false}}
   end
 
   @impl GenServer
@@ -64,6 +67,34 @@ defmodule VintageNetQMI.ModemInfo do
     end
   end
 
+  def handle_info(:get_model, state) do
+    qmi = VintageNetQMI.qmi_name(state.ifname)
+
+    case DeviceManagement.get_model(qmi) do
+      {:ok, model} ->
+        property_table_put("model", model, state)
+        return_value(%{state | model: true})
+
+      {:error, reason} ->
+        Logger.debug("[VintageNetQMI] unable to get modem model for #{inspect(reason)}")
+        retry_and_return(:get_model, state)
+    end
+  end
+
+  def handle_info(:get_manufacture, state) do
+    qmi = VintageNetQMI.qmi_name(state.ifname)
+
+    case DeviceManagement.get_manufacturer(qmi) do
+      {:ok, manufacture} ->
+        property_table_put("manufacture", manufacture, state)
+        return_value(%{state | manufacture: true})
+
+      {:error, reason} ->
+        Logger.debug("[VintageNetQMI] unable to get modem manufacture for #{inspect(reason)}")
+        retry_and_return(:get_manufacture, state)
+    end
+  end
+
   defp put_serial_numbers(serial_numbers, state) do
     Enum.each(serial_numbers, fn
       {serial_number_name, serial_number} ->
@@ -82,7 +113,7 @@ defmodule VintageNetQMI.ModemInfo do
     return_value(state)
   end
 
-  defp return_value(%{iccid: true, serial_numbers: true} = state) do
+  defp return_value(%{iccid: true, serial_numbers: true, model: true, manufacture: true} = state) do
     {:stop, :normal, state}
   end
 
