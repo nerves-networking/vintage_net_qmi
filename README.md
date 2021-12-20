@@ -89,6 +89,8 @@ technology the following:
 | `access_technology` | atom     | The technology currently in use to connect to the network |
 | `band`        | string         | The frequency band in use |
 | `channel`     | integer        | An integer that indicates the channel that's in use |
+| `manufacturer` | string        | The name of the manufacturer of the modem |
+| `model`       | string         | The name of the model of the modem        |
 
 The following properties are TBD:
 
