@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.2.12] - 2021-12-20
+
+### Added
+
+* Property named `"manufacturer"` for the manufacturer name of the modem
+* Property named `"model"` for the product name of the modem
+
 ## [v0.2.11] - 2021-11-18
 
 ### Fixes
@@ -136,4 +143,7 @@
 
 Initial Release
 
+[v0.2.12]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.11...v0.2.12
+[v0.2.11]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.10...v0.2.11
+[v0.2.10]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.9...v0.2.10
 [v0.2.9]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.8...v0.2.9
