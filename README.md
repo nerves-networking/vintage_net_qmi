@@ -61,6 +61,31 @@ your service providers. It is common that this is a list of one item.
 Currently only one service provider is supported, so replace `"fill_in"` with
 the APN that they gave you.
 
+## Service provider APN selection via ICCID
+
+If you're deploying SIMs from multiple service providers, you'll need to set
+the APN based on what SIM was installed in the device. One way is to set
+a configuration manually when you install the SIM. An easier way is to have
+`VintageNetQMI` pick the APN based on the SIM's ICCID.
+
+This featured is enabled by using the `:only_iccid_prefixes` option and listing
+multiple service providers. `VintageNetQMI` looks at the `:service_providers`
+list in order until one matches. Leave off the`:only_iccid_prefixes` option on
+the final service provider to provide a catch-all APN.
+
+Here's an example:
+
+```elixir
+VintageNet.configure("wwan0", %{
+      type: VintageNetQMI,
+      vintage_net_qmi: %{
+        service_providers: [
+          %{apn: "special_service_provider", only_iccid_prefixes: ["8973611", "8973612"]},
+          %{apn: "default_apn"}
+        ]
+      }
+    })
+```
 ## VintageNet Properties
 
 In addition to the common `vintage_net` properties for all interface types, this
