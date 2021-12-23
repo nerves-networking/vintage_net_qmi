@@ -7,10 +7,10 @@ defmodule VintageNetQMI.Connection do
 
   alias QMI.WirelessData
   alias VintageNet.PropertyTable
+  alias VintageNetQMI.ServiceProvider
 
   require Logger
 
-  @try_connect_interval 20_000
   @configure_connection_stats_retry 10_000
 
   @typedoc """
@@ -46,18 +46,22 @@ defmodule VintageNetQMI.Connection do
   @impl GenServer
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
-    service_providers = Keyword.fetch!(args, :service_providers)
+    providers = Keyword.fetch!(args, :service_providers)
+
+    VintageNet.subscribe(["interface", ifname, "mobile", "iccid"])
+    iccid = VintageNet.get(["interface", ifname, "mobile", "iccid"])
 
     state =
       %{
         ifname: ifname,
         qmi: VintageNetQMI.qmi_name(ifname),
-        service_providers: service_providers
+        service_providers: providers,
+        iccid: iccid,
+        connect_retry_interval: 30_000
       }
       |> try_configure_connection_stats_reporting()
-
-    :ok = start_connect_timer()
-    :ok = maybe_retry_configure_connection_stats(state)
+      |> maybe_retry_configure_connection_stats()
+      |> maybe_start_try_to_connect_timer()
 
     {:ok, state}
   end
@@ -87,42 +91,66 @@ defmodule VintageNetQMI.Connection do
   end
 
   @impl GenServer
-  def handle_info(:connect, state) do
-    case WirelessData.start_network_interface(state.qmi,
-           apn: first_apn(state.service_providers)
-         ) do
-      {:ok, _} ->
-        Logger.warn("[VintageNetQMI]: network started. Waiting on DHCP")
-        # Internet connectivity is determined once DHCP returns so this is not
-        {:noreply, state}
+  def handle_info(
+        {VintageNet, ["interface", ifname, "mobile", "iccid"], nil, iccid, _meta},
+        %{ifname: ifname} = state
+      ) do
+    new_state = %{state | iccid: iccid}
 
-      {:error, reason} ->
-        Logger.warn("[VintageNetQMI]: could not connect for #{inspect(reason)}.")
-        start_connect_timer()
-        {:noreply, state}
-    end
+    {:noreply, try_to_connect(new_state)}
+  end
+
+  def handle_info(:try_to_connect, state) do
+    {:noreply, try_to_connect(state)}
   end
 
   def handle_info(:configure_connection_stats, state) do
-    new_state = try_configure_connection_stats_reporting(state)
-
-    :ok = maybe_retry_configure_connection_stats(new_state)
+    new_state =
+      state
+      |> try_configure_connection_stats_reporting()
+      |> maybe_retry_configure_connection_stats()
 
     {:noreply, new_state}
   end
 
-  defp start_connect_timer() do
-    _ = Process.send_after(self(), :connect, @try_connect_interval)
-    :ok
+  defp try_to_connect(state) do
+    with apn when apn != nil <-
+           ServiceProvider.select_apn_by_iccid(state.service_providers, state.iccid),
+         {:ok, _} <- WirelessData.start_network_interface(state.qmi, apn: apn) do
+      Logger.info("[VintageNetQMI]: network started. Waiting on DHCP")
+      state
+    else
+      nil ->
+        Logger.warn(
+          "[VintageNetQMI]: cannot select an APN to use from the configured service providers, check your configuration for VintageNet."
+        )
+
+        state
+
+      {:error, reason} ->
+        Logger.warn(
+          "[VintageNetQMI]: could not connect for #{inspect(reason)}. Retrying in #{inspect(state.connect_retry_interval)} ms."
+        )
+
+        start_try_to_connect_timer(state)
+    end
   end
 
-  def maybe_retry_configure_connection_stats(%{connection_stats_configured: true}), do: :ok
+  defp maybe_start_try_to_connect_timer(%{iccid: nil} = state), do: state
 
-  def maybe_retry_configure_connection_stats(%{connection_stats_configured: false}) do
+  defp maybe_start_try_to_connect_timer(state), do: start_try_to_connect_timer(state)
+
+  defp start_try_to_connect_timer(state) do
+    _ = Process.send_after(self(), :try_to_connect, state.connect_retry_interval)
+    state
+  end
+
+  def maybe_retry_configure_connection_stats(%{connection_stats_configured: true} = state),
+    do: state
+
+  def maybe_retry_configure_connection_stats(%{connection_stats_configured: false} = state) do
     _ = Process.send_after(self(), :configure_connection_stats, @configure_connection_stats_retry)
 
-    :ok
+    state
   end
-
-  defp first_apn([%{apn: apn} | _rest]), do: apn
 end
