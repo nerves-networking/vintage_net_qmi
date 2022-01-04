@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.2.13] - 2022-1-4
+
+### Added
+
+* Allow APN selection based off ICCID when deploying SIMs from multiple service
+  providers
+
 ## [v0.2.12] - 2021-12-20
 
 ### Added
