@@ -118,6 +118,7 @@ defmodule VintageNetQMI.Connection do
            ServiceProvider.select_apn_by_iccid(state.service_providers, state.iccid),
          {:ok, _} <- WirelessData.start_network_interface(state.qmi, apn: apn) do
       Logger.info("[VintageNetQMI]: network started. Waiting on DHCP")
+      PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "apn"], apn)
       state
     else
       nil ->
