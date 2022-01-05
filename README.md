@@ -116,6 +116,7 @@ technology the following:
 | `channel`     | integer        | An integer that indicates the channel that's in use |
 | `manufacturer` | string        | The name of the manufacturer of the modem |
 | `model`       | string         | The name of the model of the modem        |
+| `apn`         | string         | The APN that VintageNetQMI configured the modem to use |
 
 The following properties are TBD:
 
