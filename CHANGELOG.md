@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.14] - 2022-1-13
+
+### Added
+
+* Show the configured APN in the property table
+
 ## [v0.2.13] - 2022-1-4
 
 ### Added
