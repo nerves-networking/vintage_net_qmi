@@ -31,10 +31,10 @@ defmodule VintageNetQMI.ModemInfo do
     send(self(), :get_iccid)
     send(self(), :get_serial_numbers)
     send(self(), :get_model)
-    send(self(), :get_manufacture)
+    send(self(), :get_manufacturer)
 
     {:ok,
-     %{ifname: ifname, iccid: false, serial_numbers: false, model: false, manufacture: false}}
+     %{ifname: ifname, iccid: false, serial_numbers: false, model: false, manufacturer: false}}
   end
 
   @impl GenServer
@@ -85,13 +85,13 @@ defmodule VintageNetQMI.ModemInfo do
     qmi = VintageNetQMI.qmi_name(state.ifname)
 
     case DeviceManagement.get_manufacturer(qmi) do
-      {:ok, manufacture} ->
-        property_table_put("manufacture", manufacture, state)
-        return_value(%{state | manufacture: true})
+      {:ok, manufacturer} ->
+        property_table_put("manufacturer", manufacturer, state)
+        return_value(%{state | manufacturer: true})
 
       {:error, reason} ->
-        Logger.debug("[VintageNetQMI] unable to get modem manufacture for #{inspect(reason)}")
-        retry_and_return(:get_manufacture, state)
+        Logger.debug("[VintageNetQMI] unable to get modem manufacturer for #{inspect(reason)}")
+        retry_and_return(:get_manufacturer, state)
     end
   end
 
@@ -113,7 +113,7 @@ defmodule VintageNetQMI.ModemInfo do
     return_value(state)
   end
 
-  defp return_value(%{iccid: true, serial_numbers: true, model: true, manufacture: true} = state) do
+  defp return_value(%{iccid: true, serial_numbers: true, model: true, manufacturer: true} = state) do
     {:stop, :normal, state}
   end
 
