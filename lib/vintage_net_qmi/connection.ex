@@ -128,6 +128,11 @@ defmodule VintageNetQMI.Connection do
 
         state
 
+      {:error, :no_effect} ->
+        # no effect means that a network connection as already be established
+        # so we don't need to try to connect again.
+        state
+
       {:error, reason} ->
         Logger.warn(
           "[VintageNetQMI]: could not connect for #{inspect(reason)}. Retrying in #{inspect(state.connect_retry_interval)} ms."
