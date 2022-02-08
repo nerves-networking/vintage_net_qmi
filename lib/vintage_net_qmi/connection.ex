@@ -5,13 +5,14 @@ defmodule VintageNetQMI.Connection do
 
   use GenServer
 
-  alias QMI.WirelessData
+  alias QMI.{NetworkAccess, WirelessData}
   alias VintageNet.PropertyTable
   alias VintageNetQMI.ServiceProvider
+  alias VintageNetQMI.Connection.Configuration
 
   require Logger
 
-  @configure_connection_stats_retry 10_000
+  @configuration_retry 5_000
 
   @typedoc """
   Options for to establish the connection
@@ -47,6 +48,7 @@ defmodule VintageNetQMI.Connection do
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
     providers = Keyword.fetch!(args, :service_providers)
+    radio_technologies = Keyword.get(args, :radio_technologies)
 
     VintageNet.subscribe(["interface", ifname, "mobile", "iccid"])
     iccid = VintageNet.get(["interface", ifname, "mobile", "iccid"])
@@ -57,23 +59,45 @@ defmodule VintageNetQMI.Connection do
         qmi: VintageNetQMI.qmi_name(ifname),
         service_providers: providers,
         iccid: iccid,
-        connect_retry_interval: 30_000
+        connect_retry_interval: 30_000,
+        radio_technologies: radio_technologies,
+        configuration: Configuration.new()
       }
-      |> try_configure_connection_stats_reporting()
-      |> maybe_retry_configure_connection_stats()
+      |> try_to_configure_modem()
       |> maybe_start_try_to_connect_timer()
 
     {:ok, state}
   end
 
-  defp try_configure_connection_stats_reporting(state) do
-    case WirelessData.set_event_report(state.qmi) do
-      :ok ->
-        Map.put(state, :connection_stats_configured, true)
+  defp try_to_configure_modem(state) do
+    case Configuration.run_configurations(state.configuration, &try_run_configuration(&1, state)) do
+      {:ok, updated_configuration} ->
+        %{state | configuration: updated_configuration}
 
-      {:error, _reason} ->
-        Map.put(state, :connection_stats_configured, false)
+      {:error, reason, config_item, updated_config} ->
+        Logger.warn(
+          "[VintageNetQMI] Failed configuring modem: #{inspect(config_item)} for reason: #{inspect(reason)}"
+        )
+
+        _ = Process.send_after(self(), :try_to_configure, @configuration_retry)
+
+        %{state | configuration: updated_config}
     end
+  end
+
+  defp try_run_configuration(:radio_technologies_set, %{radio_technologies: rts})
+       when rts in [nil, []] do
+    :ok
+  end
+
+  defp try_run_configuration(:radio_technologies_set, state) do
+    NetworkAccess.set_system_selection_preference(state.qmi,
+      mode_preference: state.radio_technologies
+    )
+  end
+
+  defp try_run_configuration(:reporting_connection_stats, state) do
+    WirelessData.set_event_report(state.qmi)
   end
 
   @impl GenServer
@@ -100,17 +124,12 @@ defmodule VintageNetQMI.Connection do
     {:noreply, try_to_connect(new_state)}
   end
 
-  def handle_info(:try_to_connect, state) do
-    {:noreply, try_to_connect(state)}
+  def handle_info(:try_to_configure, state) do
+    {:noreply, try_to_configure_modem(state)}
   end
 
-  def handle_info(:configure_connection_stats, state) do
-    new_state =
-      state
-      |> try_configure_connection_stats_reporting()
-      |> maybe_retry_configure_connection_stats()
-
-    {:noreply, new_state}
+  def handle_info(:try_to_connect, state) do
+    {:noreply, try_to_connect(state)}
   end
 
   defp try_to_connect(state) do
@@ -144,19 +163,16 @@ defmodule VintageNetQMI.Connection do
 
   defp maybe_start_try_to_connect_timer(%{iccid: nil} = state), do: state
 
-  defp maybe_start_try_to_connect_timer(state), do: start_try_to_connect_timer(state)
+  defp maybe_start_try_to_connect_timer(state) do
+    if Configuration.required_configured?(state.configuration) do
+      start_try_to_connect_timer(state)
+    else
+      state
+    end
+  end
 
   defp start_try_to_connect_timer(state) do
     _ = Process.send_after(self(), :try_to_connect, state.connect_retry_interval)
-    state
-  end
-
-  def maybe_retry_configure_connection_stats(%{connection_stats_configured: true} = state),
-    do: state
-
-  def maybe_retry_configure_connection_stats(%{connection_stats_configured: false} = state) do
-    _ = Process.send_after(self(), :configure_connection_stats, @configure_connection_stats_retry)
-
     state
   end
 end
