@@ -23,7 +23,8 @@ defmodule VintageNetQMITest do
            indication_callback: VintageNetQMI.indication_callback("wwan0")
          ]},
         {VintageNetQMI.Connectivity, [ifname: "wwan0"]},
-        {VintageNetQMI.Connection, [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}]]},
+        {VintageNetQMI.Connection,
+         [{:ifname, "wwan0"}, service_providers: [%{apn: "super"}], radio_technologies: nil]},
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.ModemInfo, [ifname: "wwan0"]},

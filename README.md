@@ -86,6 +86,32 @@ VintageNet.configure("wwan0", %{
       }
     })
 ```
+
+## Configure radio technologies
+
+In some cases you might want to set to the radio access technology (RAT) to only
+use a subset of what the modem is capable of using. To specify which RATs to use
+you can set the optional configuration field `:only_radio_technologies`.
+
+```elixir
+VintageNet.configure("wwan0", %{
+      type: VintageNetQMI,
+      vintage_net_qmi: %{
+        only_radio_technologies: [:lte, :umts],
+        service_providers: [
+          %{apn: "apn_name"}
+        ]
+      }
+    })
+```
+
+The example above will limit the possible RATs used to `:lte` (4G) and `:umts`
+(3G). For more information which radio technologies are available please see
+the `:qmi` [documentation](https://hexdocs.pm/qmi/QMI.Codec.NetworkAccess.html#t:radio_interface/0).
+
+If this configuration is provided, the modem will use the default configuration
+that provided by the manufacturer.
+
 ## VintageNet Properties
 
 In addition to the common `vintage_net` properties for all interface types, this
