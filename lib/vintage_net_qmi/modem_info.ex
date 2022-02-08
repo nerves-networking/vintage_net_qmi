@@ -81,7 +81,7 @@ defmodule VintageNetQMI.ModemInfo do
     end
   end
 
-  def handle_info(:get_manufacture, state) do
+  def handle_info(:get_manufacturer, state) do
     qmi = VintageNetQMI.qmi_name(state.ifname)
 
     case DeviceManagement.get_manufacturer(qmi) do
