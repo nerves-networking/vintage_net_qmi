@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.3.0] - 2021-02-10
+
+There was a fix that changed the property reported in the property table from
+`"manufacture"` to `"manufacturer"`. To upgrade you will want to change any
+code that this is subscribe to this property to have the correct spelling.
+
+### Added
+
+* Add support to configure which radio technologies you want the modem to use
+
+### Fixes
+
+* References to manufacturer
+* Infinite retrying to establish connection after the connection has been
+  established
+* Report selected APN before connection attempt
+
 ## [v0.2.14] - 2022-1-13
 
 ### Added

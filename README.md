@@ -15,7 +15,7 @@ To use this library, first add it to your project's dependency list:
 ```elixir
 def deps do
   [
-    {:vintage_net_qmi, "~> 0.2.14"}
+    {:vintage_net_qmi, "~> 0.3.0"}
   ]
 end
 ```
