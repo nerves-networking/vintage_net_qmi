@@ -92,7 +92,8 @@ defmodule VintageNetQMI.Connection do
 
   defp try_run_configuration(:radio_technologies_set, state) do
     NetworkAccess.set_system_selection_preference(state.qmi,
-      mode_preference: state.radio_technologies
+      mode_preference: state.radio_technologies,
+      roaming_preference: :any
     )
   end
 
@@ -125,7 +126,13 @@ defmodule VintageNetQMI.Connection do
   end
 
   def handle_info(:try_to_configure, state) do
-    {:noreply, try_to_configure_modem(state)}
+    new_state = try_to_configure_modem(state)
+
+    if Configuration.completely_configured?(new_state.configuration) do
+      try_to_connect(new_state)
+    end
+
+    {:noreply, new_state}
   end
 
   def handle_info(:try_to_connect, state) do
@@ -133,10 +140,25 @@ defmodule VintageNetQMI.Connection do
   end
 
   defp try_to_connect(state) do
-    with apn when apn != nil <-
-           ServiceProvider.select_apn_by_iccid(state.service_providers, state.iccid),
-         :ok <- PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "apn"], apn),
-         {:ok, _} <- WirelessData.start_network_interface(state.qmi, apn: apn) do
+    three_3gpp_profile_index = 1
+
+    with %{} = provider <-
+           ServiceProvider.select_provider_by_iccid(state.service_providers, state.iccid),
+         :ok <-
+           PropertyTable.put(
+             VintageNet,
+             ["interface", state.ifname, "mobile", "apn"],
+             provider.apn
+           ),
+         {:ok, _} <-
+           WirelessData.modify_profile_settings(state.qmi, three_3gpp_profile_index,
+             roaming_disallowed: provider[:disable_roaming] || false
+           ),
+         {:ok, _} <-
+           WirelessData.start_network_interface(state.qmi,
+             apn: provider.apn,
+             profile_3gpp_index: three_3gpp_profile_index
+           ) do
       Logger.info("[VintageNetQMI]: network started. Waiting on DHCP")
       state
     else

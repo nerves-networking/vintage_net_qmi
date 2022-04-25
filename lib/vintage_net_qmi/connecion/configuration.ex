@@ -88,7 +88,10 @@ defmodule VintageNetQMI.Connection.Configuration do
     |> Enum.all?(fn {_, value} -> value end)
   end
 
-  @doc false
+  @doc """
+  Check if the configuration is completely configured
+  """
+  @spec completely_configured?(t()) :: boolean()
   def completely_configured?(config) do
     Enum.reduce_while(config, true, fn
       {_setting, true}, acc -> {:cont, acc}
