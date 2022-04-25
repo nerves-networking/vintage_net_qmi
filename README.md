@@ -112,6 +112,24 @@ the `:qmi` [documentation](https://hexdocs.pm/qmi/QMI.Codec.NetworkAccess.html#t
 If this configuration is provided, the modem will use the default configuration
 that provided by the manufacturer.
 
+## Disabling roaming
+
+By default roaming for a modem is enabled, if you want to disable this for a
+service provider you can pass the `:disable_roaming` field to the service
+provider configuration:
+
+```elixir
+VintageNet.configure("wwan0", %{
+      type: VintageNetQMI,
+      vintage_net_qmi: %{
+        only_radio_technologies: [:lte, :umts],
+        service_providers: [
+          %{apn: "apn_name", disable_roaming: true}
+        ]
+      }
+    })
+```
+
 ## VintageNet Properties
 
 In addition to the common `vintage_net` properties for all interface types, this
