@@ -6,7 +6,6 @@ defmodule VintageNetQMI.Connection do
   use GenServer
 
   alias QMI.{NetworkAccess, WirelessData}
-  alias VintageNet.PropertyTable
   alias VintageNetQMI.ServiceProvider
   alias VintageNetQMI.Connection.Configuration
 
@@ -144,12 +143,11 @@ defmodule VintageNetQMI.Connection do
 
     with %{} = provider <-
            ServiceProvider.select_provider_by_iccid(state.service_providers, state.iccid),
-         :ok <-
-           PropertyTable.put(
-             VintageNet,
-             ["interface", state.ifname, "mobile", "apn"],
-             provider.apn
-           ),
+         PropertyTable.put(
+           VintageNet,
+           ["interface", state.ifname, "mobile", "apn"],
+           provider.apn
+         ),
          :ok <- set_roaming_allowed_for_provider(provider, three_3gpp_profile_index, state),
          {:ok, _} <-
            WirelessData.start_network_interface(state.qmi,

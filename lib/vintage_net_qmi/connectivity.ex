@@ -4,7 +4,7 @@ defmodule VintageNetQMI.Connectivity do
   use GenServer
 
   alias VintageNet.PowerManager.PMControl
-  alias VintageNet.{PropertyTable, RouteManager}
+  alias VintageNet.RouteManager
 
   @typedoc """
   Connectivity server initial arguments
@@ -105,16 +105,18 @@ defmodule VintageNetQMI.Connectivity do
       :std_offset
     ]
 
-    Enum.each(fields, &maybe_update_time_location_property(serving_system, &1, state))
+    properties = Enum.flat_map(fields, &maybe_time_location_property(serving_system, &1, state))
+
+    PropertyTable.put_many(VintageNet, properties)
   end
 
-  defp maybe_update_time_location_property(serving_system, field, state) do
+  defp maybe_time_location_property(serving_system, field, state) do
     if value = serving_system[field] do
       prop_name = prop_name_for_serving_system_field(field)
-      PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", prop_name], value)
+      [{["interface", state.ifname, "mobile", prop_name], value}]
+    else
+      []
     end
-
-    :ok
   end
 
   defp prop_name_for_serving_system_field(:location_area_code), do: "lac"

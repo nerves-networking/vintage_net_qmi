@@ -8,7 +8,6 @@ defmodule VintageNetQMI.CellMonitor do
   require Logger
 
   alias QMI.NetworkAccess
-  alias VintageNet.PropertyTable
 
   defp init_state(ifname, poll_interval) do
     %{
@@ -61,14 +60,11 @@ defmodule VintageNetQMI.CellMonitor do
   end
 
   defp maybe_post_home_network({:ok, home_network}, state) do
-    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mcc"], home_network.mcc)
-    PropertyTable.put(VintageNet, ["interface", state.ifname, "mobile", "mnc"], home_network.mnc)
-
-    PropertyTable.put(
-      VintageNet,
-      ["interface", state.ifname, "mobile", "provider"],
-      home_network.provider
-    )
+    PropertyTable.put_many(VintageNet, [
+      {["interface", state.ifname, "mobile", "mcc"], home_network.mcc},
+      {["interface", state.ifname, "mobile", "mnc"], home_network.mnc},
+      {["interface", state.ifname, "mobile", "provider"], home_network.provider}
+    ])
 
     state
   end
