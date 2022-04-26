@@ -13,7 +13,6 @@ defmodule VintageNetQMI.ModemInfo do
   require Logger
 
   alias QMI.{DeviceManagement, UserIdentity}
-  alias VintageNet.PropertyTable
 
   @type init_arg() :: {:ifname, VintageNet.ifname()}
 
@@ -102,6 +101,10 @@ defmodule VintageNetQMI.ModemInfo do
         |> Atom.to_string()
         |> property_table_put(serial_number, state)
     end)
+  end
+
+  defp property_table_put(property, nil, state) do
+    PropertyTable.delete(VintageNet, ["interface", state.ifname, "mobile", property])
   end
 
   defp property_table_put(property, value, state) do

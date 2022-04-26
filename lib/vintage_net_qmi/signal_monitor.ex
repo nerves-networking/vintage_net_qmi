@@ -4,7 +4,6 @@ defmodule VintageNetQMI.SignalMonitor do
   use GenServer
 
   alias QMI.NetworkAccess
-  alias VintageNet.PropertyTable
   alias VintageNetQMI.ASUCalculator
 
   require Logger
@@ -68,22 +67,26 @@ defmodule VintageNetQMI.SignalMonitor do
   end
 
   defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars}, ifname) do
-    post_property(ifname, "signal_asu", asu)
-    post_property(ifname, "signal_dbm", dbm)
-    post_property(ifname, "signal_4bars", bars)
+    PropertyTable.put_many(VintageNet, [
+      to_property(ifname, "signal_asu", asu),
+      to_property(ifname, "signal_dbm", dbm),
+      to_property(ifname, "signal_4bars", bars)
+    ])
   end
 
   defp post_band_and_channel_info(
          %{band: band, channel: channel, interface: access_technology},
          state
        ) do
-    post_property(state.ifname, "band", band)
-    post_property(state.ifname, "channel", channel)
-    post_property(state.ifname, "access_technology", access_technology)
+    PropertyTable.put_many(VintageNet, [
+      to_property(state.ifname, "band", band),
+      to_property(state.ifname, "channel", channel),
+      to_property(state.ifname, "access_technology", access_technology)
+    ])
   end
 
-  defp post_property(ifname, prop_name, prop_value) do
-    PropertyTable.put(VintageNet, ["interface", ifname, "mobile", prop_name], prop_value)
+  defp to_property(ifname, prop_name, prop_value) do
+    {["interface", ifname, "mobile", prop_name], prop_value}
   end
 
   defp send_msgs(messages, interval) do
