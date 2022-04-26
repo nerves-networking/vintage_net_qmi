@@ -3,12 +3,12 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
   alias VintageNetQMI.ServiceProvider
 
-  describe "Selecting an APN for a service provider based off ICCID" do
+  describe "Selecting provider for a service provider based off ICCID" do
     test "when no prefixes are provided" do
       provider = %{apn: "fake"}
       iccid = "891004234814455936F"
 
-      assert "fake" == ServiceProvider.select_apn_by_iccid([provider], iccid)
+      assert provider == ServiceProvider.select_provider_by_iccid([provider], iccid)
     end
 
     test "when prefix option matches the ICCID prefixes" do
@@ -20,8 +20,10 @@ defmodule VintageNetQMI.ServiceProviderTest do
       first_iccid = "891004234814455936F"
       second_iccid = "898823454545458F651"
 
-      assert "first one" == ServiceProvider.select_apn_by_iccid(providers, first_iccid)
-      assert "second one" == ServiceProvider.select_apn_by_iccid(providers, second_iccid)
+      [first_provider, second_provider | _] = providers
+
+      assert first_provider == ServiceProvider.select_provider_by_iccid(providers, first_iccid)
+      assert second_provider == ServiceProvider.select_provider_by_iccid(providers, second_iccid)
     end
 
     test "when prefix option does not match ICCID prefix" do
@@ -29,7 +31,7 @@ defmodule VintageNetQMI.ServiceProviderTest do
       iccid = "891004234814455936F"
 
       assert nil ==
-               ServiceProvider.select_apn_by_iccid([provider], iccid)
+               ServiceProvider.select_provider_by_iccid([provider], iccid)
     end
 
     test "when no prefixes are provided first" do
@@ -40,7 +42,9 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       iccid = "8917171711111111FF"
 
-      assert "this one" == ServiceProvider.select_apn_by_iccid(providers, iccid)
+      [_, this_one | _] = providers
+
+      assert this_one == ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
 
     test "default to service provider with out ICCID selection when non match" do
@@ -51,7 +55,7 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       iccid = "8947571711111111FF"
 
-      assert "this one" == ServiceProvider.select_apn_by_iccid(providers, iccid)
+      assert List.first(providers) == ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
   end
 end
