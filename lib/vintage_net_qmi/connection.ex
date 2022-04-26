@@ -92,8 +92,7 @@ defmodule VintageNetQMI.Connection do
 
   defp try_run_configuration(:radio_technologies_set, state) do
     NetworkAccess.set_system_selection_preference(state.qmi,
-      mode_preference: state.radio_technologies,
-      roaming_preference: :any
+      mode_preference: state.radio_technologies
     )
   end
 
@@ -128,9 +127,10 @@ defmodule VintageNetQMI.Connection do
   def handle_info(:try_to_configure, state) do
     new_state = try_to_configure_modem(state)
 
-    if Configuration.completely_configured?(new_state.configuration) do
-      try_to_connect(new_state)
-    end
+    _ =
+      if Configuration.completely_configured?(new_state.configuration) do
+        Process.send_after(self(), :try_to_connect, 1_000)
+      end
 
     {:noreply, new_state}
   end
@@ -150,10 +150,7 @@ defmodule VintageNetQMI.Connection do
              ["interface", state.ifname, "mobile", "apn"],
              provider.apn
            ),
-         {:ok, _} <-
-           WirelessData.modify_profile_settings(state.qmi, three_3gpp_profile_index,
-             roaming_disallowed: provider[:disable_roaming] || false
-           ),
+         :ok <- set_roaming_allowed_for_provider(provider, three_3gpp_profile_index, state),
          {:ok, _} <-
            WirelessData.start_network_interface(state.qmi,
              apn: provider.apn,
@@ -181,6 +178,32 @@ defmodule VintageNetQMI.Connection do
 
         start_try_to_connect_timer(state)
     end
+  end
+
+  defp set_roaming_allowed_for_provider(
+         %{roaming_allowed?: roaming_allowed?},
+         profile_index,
+         state
+       ) do
+    case WirelessData.modify_profile_settings(state.qmi, profile_index,
+           # We have to set the opposite of what was passed in because QMI
+           # configures if roaming is disallowed whereas our public
+           # configuration API configures if roaming is allowed.
+           roaming_disallowed: !roaming_allowed?
+         ) do
+      {:ok, %{extended_error_code: nil}} ->
+        :ok
+
+      {:ok, has_error} ->
+        {:error, has_error}
+
+      error ->
+        error
+    end
+  end
+
+  defp set_roaming_allowed_for_provider(_, _, _) do
+    :ok
   end
 
   defp maybe_start_try_to_connect_timer(%{iccid: nil} = state), do: state
