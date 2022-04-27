@@ -2,8 +2,8 @@ defmodule VintageNetQMI do
   @moduledoc """
   Use a QMI-enabled cellular modem with VintageNet
 
-  This module is not intended to be called directly but via calls to `VintageNet`. Here's a
-  typical example:
+  This module is not intended to be called directly but via calls to `VintageNet`. Here's an
+  example:
 
   ```elixir
   VintageNet.configure(
@@ -11,7 +11,12 @@ defmodule VintageNetQMI do
     %{
       type: VintageNetQMI,
       vintage_net_qmi: %{
-        service_providers: [%{apn: "super"}]
+        service_providers: [
+          %{apn: "favorite_apn", only_iccid_prefixes: ["1234"]},
+          %{apn: "second_favorite_apn", only_iccid_prefixes: ["56789"]},
+          %{apn: "last_resort_apn"}
+        ],
+        only_radio_technologies: [:lte]
       }
     }
   )
@@ -22,31 +27,22 @@ defmodule VintageNetQMI do
   * `:service_providers` - This is a list of service provider information
 
   The `:service_providers` key should be set to information provided by each of
-  your service providers. Currently only the first service provider is used.
+  your service providers.
 
   Information for each service provider is a map with some or all of the following
   fields:
 
   * `:apn` (required) - e.g., `"access_point_name"`
+  * `:only_iccid_prefixes` (optional) - only use this APN if the one of the strings
+    in the list is a prefix of the ICCID. E.g, `["1234"]`
+
+  When multiple entries are specified, the first allowed service provider is used.
 
   Your service provider should provide you with the information that you need to
   connect. Often it is just an APN. The Gnome project provides a database of
   [service provider
   information](https://wiki.gnome.org/Projects/NetworkManager/MobileBroadband/ServiceProviders)
   that may also be useful.
-
-  Here's an example with a service provider list:
-
-  ```elixir
-    %{
-      type: VintageNetQMI,
-      vintage_net_qmi: %{
-        service_providers: [
-          %{apn: "wireless.twilio.com"}
-        ],
-      }
-    }
-  ```
   """
 
   @behaviour VintageNet.Technology
