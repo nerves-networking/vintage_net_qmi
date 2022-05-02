@@ -1,13 +1,19 @@
 # Changelog
 
-## [v0.3.1] - 2021-04-27
+## [v0.3.2] - 2022-05-02
+
+### Changed
+
+* `:vintage_net` `v0.12.0` and up is now required
+
+## [v0.3.1] - 2022-04-27
 
 ### Added
 
 * Add support for `:roaming_allowed?` field in a service provider configuration
   to allow or disallow roaming when using the configured service provider.
 
-## [v0.3.0] - 2021-02-10
+## [v0.3.0] - 2022-02-10
 
 There was a fix that changed the property reported in the property table from
 `"manufacture"` to `"manufacturer"`. To upgrade you will want to change any
@@ -180,6 +186,7 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.3.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.14...v0.3.0
 [v0.2.14]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.13...v0.2.14
