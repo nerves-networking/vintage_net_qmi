@@ -33,7 +33,17 @@ defmodule VintageNetQMI.SignalMonitor do
 
   @impl GenServer
   def handle_info(:signal_check, state) do
-    :ok = get_signal_stats(state)
+    case NetworkAccess.get_signal_strength(state.qmi) do
+      {:ok, %{rssi_reports: [rssi_data]}} ->
+        rssi_data
+        |> to_rssi()
+        |> Map.put(:rssi, rssi_data.rssi)
+        |> post_signal_rssi(state)
+        |> execute_telemetry_event(state)
+
+      {:error, _reason} ->
+        Logger.debug("[VintageNetQMI] unable to get signal strength, retrying.")
+    end
 
     send_msgs([:signal_check], state.interval)
 
@@ -54,24 +64,18 @@ defmodule VintageNetQMI.SignalMonitor do
     {:noreply, state}
   end
 
-  defp get_signal_stats(state) do
-    {:ok, %{rssi_reports: [rssi_data]}} = NetworkAccess.get_signal_strength(state.qmi)
-
-    rssi_data
-    |> to_rssi()
-    |> post_signal_rssi(state.ifname)
-  end
-
   defp to_rssi(%{rssi: rssi}) do
     ASUCalculator.from_lte_rssi(rssi)
   end
 
-  defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars}, ifname) do
+  defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars} = rssi, state) do
     PropertyTable.put_many(VintageNet, [
-      to_property(ifname, "signal_asu", asu),
-      to_property(ifname, "signal_dbm", dbm),
-      to_property(ifname, "signal_4bars", bars)
+      to_property(state.ifname, "signal_asu", asu),
+      to_property(state.ifname, "signal_dbm", dbm),
+      to_property(state.ifname, "signal_4bars", bars)
     ])
+
+    rssi
   end
 
   defp post_band_and_channel_info(
@@ -91,5 +95,13 @@ defmodule VintageNetQMI.SignalMonitor do
 
   defp send_msgs(messages, interval) do
     Enum.each(messages, &Process.send_after(self(), &1, interval))
+  end
+
+  defp execute_telemetry_event(signal_measurements, state) do
+    :telemetry.execute(
+      [:vintage_net_qmi, :signal_strength],
+      signal_measurements,
+      %{ifname: state.ifname}
+    )
   end
 end
