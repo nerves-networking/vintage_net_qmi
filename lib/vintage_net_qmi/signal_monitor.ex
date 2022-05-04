@@ -68,11 +68,11 @@ defmodule VintageNetQMI.SignalMonitor do
     ASUCalculator.from_lte_rssi(rssi)
   end
 
-  defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars} = rssi, ifname) do
+  defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars} = rssi, state) do
     PropertyTable.put_many(VintageNet, [
-      to_property(ifname, "signal_asu", asu),
-      to_property(ifname, "signal_dbm", dbm),
-      to_property(ifname, "signal_4bars", bars)
+      to_property(state.ifname, "signal_asu", asu),
+      to_property(state.ifname, "signal_dbm", dbm),
+      to_property(state.ifname, "signal_4bars", bars)
     ])
 
     rssi
