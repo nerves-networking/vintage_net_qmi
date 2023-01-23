@@ -6,8 +6,8 @@ defmodule VintageNetQMI.Connection do
   use GenServer
 
   alias QMI.{NetworkAccess, WirelessData}
-  alias VintageNetQMI.ServiceProvider
   alias VintageNetQMI.Connection.Configuration
+  alias VintageNetQMI.ServiceProvider
 
   require Logger
 

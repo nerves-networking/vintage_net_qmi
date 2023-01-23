@@ -1,7 +1,7 @@
 defmodule VintageNetQMI.MixProject do
   use Mix.Project
 
-  @version "0.3.2"
+  @version "0.3.3"
   @source_url "https://github.com/nerves-networking/vintage_net_qmi"
 
   def project do
@@ -12,9 +12,7 @@ defmodule VintageNetQMI.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
-      dialyzer: [
-        flags: [:unmatched_returns, :error_handling, :race_conditions]
-      ],
+      dialyzer: dialyzer(),
       docs: docs(),
       package: package(),
       preferred_cli_env: [
@@ -33,10 +31,10 @@ defmodule VintageNetQMI.MixProject do
 
   defp deps do
     [
-      {:vintage_net, "~> 0.12.0"},
+      {:vintage_net, "~> 0.12.0 or ~> 0.13.0"},
       {:qmi, "~> 0.8.4"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false},
       {:excoveralls, "~> 0.14", only: :test, runtime: false},
       {:telemetry, "~> 0.4.3 or ~> 1.0"}
@@ -45,6 +43,12 @@ defmodule VintageNetQMI.MixProject do
 
   defp description do
     "VintageNet Support for QMI Cellular Modems"
+  end
+
+  defp dialyzer() do
+    [
+      flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs]
+    ]
   end
 
   def docs do

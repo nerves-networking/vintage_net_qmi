@@ -169,7 +169,12 @@ defmodule VintageNetQMI.Connectivity do
        ) do
     new_connection = :internet
 
-    RouteManager.set_connection_status(state.ifname, new_connection)
+    RouteManager.set_connection_status(
+      state.ifname,
+      new_connection,
+      "QMI reports Internet-connectivity"
+    )
+
     state = execute_telemetry_events(new_connection, state)
 
     %{state | cached_status: :internet}
@@ -179,7 +184,13 @@ defmodule VintageNetQMI.Connectivity do
     new_connection = :disconnected
 
     RouteManager.set_connection_status(state.ifname, new_connection)
-    state = execute_telemetry_events(new_connection, state)
+    RouteManager.set_connection_status(
+      state.ifname,
+      new_connection,
+      "QMI(lan?=#{state.lan?},serving_system?=#{state.serving_system?},ip?=#{state.ip_address?},packet_data=#{state.packet_data_connection}"
+    )
+
+   state = execute_telemetry_events(new_connection, state)
 
     %{state | cached_status: new_connection}
   end
