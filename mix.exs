@@ -12,9 +12,7 @@ defmodule VintageNetQMI.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
-      dialyzer: [
-        flags: [:unmatched_returns, :error_handling, :race_conditions]
-      ],
+      dialyzer: dialyzer(),
       docs: docs(),
       package: package(),
       preferred_cli_env: [
@@ -44,6 +42,12 @@ defmodule VintageNetQMI.MixProject do
 
   defp description do
     "VintageNet Support for QMI Cellular Modems"
+  end
+
+  defp dialyzer() do
+    [
+      flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs]
+    ]
   end
 
   def docs do
