@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.3.3] - 2023-01-23
+
+### Changed
+
+* Allow `:vintage_net` `v0.13.0` to be used
+* Add some more information when QMI reports no internet
+
 ## [v0.3.2] - 2022-05-02
 
 ### Changed
@@ -186,6 +193,7 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.3.3]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.2...v0.3.3
 [v0.3.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.2.14...v0.3.0
