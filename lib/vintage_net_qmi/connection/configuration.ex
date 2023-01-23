@@ -23,8 +23,8 @@ defmodule VintageNetQMI.Connection.Configuration do
   be considered complete.
   """
   @type t() :: %{
-          reporting_connection_stats: boolean(),
-          radio_technologies_set: boolean()
+          optional(:reporting_connection_stats) => boolean(),
+          :radio_technologies_set => boolean()
         }
 
   @type configuration_setting() :: :reporting_connection_stats | :radio_technologies_set
@@ -44,7 +44,7 @@ defmodule VintageNetQMI.Connection.Configuration do
   @doc """
   Create a new connection configuration with all fields marked as not configured
   """
-  @spec new() :: t()
+  @spec new() :: %{reporting_connection_stats: false, radio_technologies_set: false}
   def new() do
     %{reporting_connection_stats: false, radio_technologies_set: false}
   end
