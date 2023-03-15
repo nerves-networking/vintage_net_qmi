@@ -176,13 +176,15 @@ defmodule VintageNetQMI.Connectivity do
   end
 
   defp update_connection_status(%{cached_status: :internet} = state) do
+    new_connection = :disconnected
+
     RouteManager.set_connection_status(
       state.ifname,
-      :disconnected,
+      new_connection,
       "QMI(lan?=#{state.lan?},serving_system?=#{state.serving_system?},ip?=#{state.ip_address?},packet_data=#{state.packet_data_connection}"
     )
 
-    %{state | cached_status: :disconnected}
+    %{state | cached_status: new_connection}
   end
 
   defp update_connection_status(state), do: state
