@@ -74,7 +74,7 @@ defmodule VintageNetQMI.Connection do
         %{state | configuration: updated_configuration}
 
       {:error, reason, config_item, updated_config} ->
-        Logger.warn(
+        Logger.warning(
           "[VintageNetQMI] Failed configuring modem: #{inspect(config_item)} for reason: #{inspect(reason)}"
         )
 
@@ -158,7 +158,7 @@ defmodule VintageNetQMI.Connection do
       state
     else
       nil ->
-        Logger.warn(
+        Logger.warning(
           "[VintageNetQMI]: cannot select an APN to use from the configured service providers, check your configuration for VintageNet."
         )
 
@@ -170,7 +170,7 @@ defmodule VintageNetQMI.Connection do
         state
 
       {:error, reason} ->
-        Logger.warn(
+        Logger.warning(
           "[VintageNetQMI]: could not connect for #{inspect(reason)}. Retrying in #{inspect(state.connect_retry_interval)} ms."
         )
 
