@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.4] - 2023-03-23
+
+### Changed
+
+* Add grace period on serving system disconnects since they're often followed
+  very quickly by a reconnect when moving between cell towers. This
+  fixes an issue where TCP connections would unnecessarily be terminated and
+  only to reconnect a second later.
+
 ## [v0.3.3] - 2023-01-23
 
 ### Changed
@@ -193,6 +202,7 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.3...v0.3.4
 [v0.3.3]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.2...v0.3.3
 [v0.3.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.0...v0.3.1
