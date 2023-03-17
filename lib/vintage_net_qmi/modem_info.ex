@@ -46,7 +46,7 @@ defmodule VintageNetQMI.ModemInfo do
         return_value(%{state | serial_numbers: true})
 
       {:error, reason} ->
-        Logger.warn("[VintageNetQMI] unable to get serial numbers for #{inspect(reason)}")
+        Logger.warning("[VintageNetQMI] unable to get serial numbers for #{inspect(reason)}")
         retry_and_return(:get_serial_numbers, state)
     end
   end
@@ -61,7 +61,7 @@ defmodule VintageNetQMI.ModemInfo do
         return_value(%{state | iccid: true})
 
       {:error, reason} ->
-        Logger.warn("[VintageNetQMI] unable to get CCID for #{inspect(reason)}")
+        Logger.warning("[VintageNetQMI] unable to get CCID for #{inspect(reason)}")
         retry_and_return(:get_iccid, state)
     end
   end
