@@ -67,6 +67,7 @@ defmodule VintageNetQMI.ASUCalculator do
   end
 
   defp dbm_to_gsm_asu(dbm) when dbm <= -113, do: 99
+  defp dbm_to_gsm_asu(dbm) when dbm >= -50, do: 31
 
   defp dbm_to_gsm_asu(dbm) do
     div(dbm + 113, 2)

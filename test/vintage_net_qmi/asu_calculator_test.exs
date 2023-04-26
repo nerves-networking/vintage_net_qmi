@@ -25,11 +25,14 @@ defmodule VintageNetQMI.ASUCalculatorTest do
   end
 
   test "computes lte asu" do
-    # Really, the only important thing here is that -113 goes to 99
-    # since 99 is a special number.
+    # The calculator only supports values 0-31 and 99, so
+    # check that it doesn't return anything out of range.
+    assert ASUCalculator.from_lte_rssi(-200).asu == 99
     assert ASUCalculator.from_lte_rssi(-113).asu == 99
     assert ASUCalculator.from_lte_rssi(-112).asu == 0
-    assert ASUCalculator.from_lte_rssi(0).asu == 56
+    assert ASUCalculator.from_lte_rssi(-52).asu == 30
+    assert ASUCalculator.from_lte_rssi(-49).asu == 31
+    assert ASUCalculator.from_lte_rssi(0).asu == 31
   end
 
   test "computes lte bars" do

@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.3.5] - 2023-04-25
+
+### Changed
+
+* Restrict reported ASU values to 0-31 | 99 to match expected values.  In one
+  case, 32 was reported for a strong signal, but prior to the change there
+  wasn't a limit.
+
 ## [v0.3.4] - 2023-03-23
 
 ### Changed
@@ -202,6 +210,7 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.4...v0.3.5
 [v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.3...v0.3.4
 [v0.3.3]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.2...v0.3.3
 [v0.3.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.1...v0.3.2
