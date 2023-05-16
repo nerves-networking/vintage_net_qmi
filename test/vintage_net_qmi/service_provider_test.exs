@@ -57,5 +57,16 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       assert List.first(providers) == ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
+
+    test "when iccid is nil select default without ICCID" do
+      providers = [
+        %{apn: "this one"},
+        %{apn: "not me", only_iccid_prefixes: ["89171717"]}
+      ]
+
+      iccid = nil
+
+      assert List.first(providers) == ServiceProvider.select_provider_by_iccid(providers, iccid)
+    end
   end
 end
