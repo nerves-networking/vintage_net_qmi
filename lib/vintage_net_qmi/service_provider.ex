@@ -26,7 +26,7 @@ defmodule VintageNetQMI.ServiceProvider do
   def select_provider_by_iccid(providers, iccid) do
     Enum.reduce_while(providers, nil, fn
       %{only_iccid_prefixes: prefixes} = provider, default ->
-        if String.starts_with?(iccid, prefixes) do
+        if is_binary(iccid) && String.starts_with?(iccid, prefixes) do
           {:halt, provider}
         else
           {:cont, default}
