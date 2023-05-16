@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.3.6] - 2023-05-16
+
+### Changed
+
+* Don't crash when selecting the APN when the ICCID is `nil`. This is an error
+  case that's made more confusing by this exception. The default APN will be
+  selected even though it's probably futile.
+
 ## [v0.3.5] - 2023-04-25
 
 ### Changed
@@ -210,7 +218,8 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
-[v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.4...v0.3.5
+[v0.3.6]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.5...v0.3.6
+[v0.3.5]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.4...v0.3.5
 [v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.3...v0.3.4
 [v0.3.3]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.2...v0.3.3
 [v0.3.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.1...v0.3.2
