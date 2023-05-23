@@ -110,6 +110,16 @@ defmodule VintageNetQMI.Connection do
       stats_with_timestamp
     )
 
+    :telemetry.execute(
+      [
+        :vintage_net_qmi,
+        :connection,
+        :statistics
+      ],
+      stats,
+      %{ifname: state.ifname}
+    )
+
     {:noreply, state}
   end
 

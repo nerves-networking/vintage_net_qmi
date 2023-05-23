@@ -22,6 +22,7 @@ defmodule VintageNetQMI.Connectivity do
   defstruct [
     :ifname,
     :reported_status,
+    :reported_status_timestamp,
     :derived_status,
     :grace_timer,
     :lan?,
@@ -79,6 +80,7 @@ defmodule VintageNetQMI.Connectivity do
     state = %__MODULE__{
       ifname: ifname,
       reported_status: guessed_status,
+      reported_status_timestamp: System.monotonic_time(),
       derived_status: guessed_status,
       grace_timer: nil,
       # The following keep track of all of the conditions that need to be
@@ -281,28 +283,56 @@ defmodule VintageNetQMI.Connectivity do
   defp update_connection_status(
          %{reported_status: :disconnected, derived_status: :internet} = state
        ) do
+    new_connection = :internet
+
     RouteManager.set_connection_status(
       state.ifname,
-      :internet,
+      new_connection,
       "QMI reports Internet-connectivity"
     )
 
-    %{state | reported_status: :internet}
+    state = execute_telemetry_events(new_connection, state)
+
+    %{state | reported_status: new_connection}
   end
 
   defp update_connection_status(
          %{reported_status: :internet, derived_status: :disconnected} = state
        ) do
+    new_connection = :disconnected
+
     RouteManager.set_connection_status(
       state.ifname,
-      :disconnected,
+      new_connection,
       "QMI(#{inspect(state)}}"
     )
 
-    %{state | reported_status: :disconnected}
+    state = execute_telemetry_events(new_connection, state)
+
+    %{state | reported_status: new_connection}
   end
 
   defp update_connection_status(state), do: state
+
+  defp execute_telemetry_events(connection, %{reported_status: connection} = state), do: state
+
+  defp execute_telemetry_events(new_connection, state) do
+    reported_status_timestamp = System.monotonic_time()
+
+    :telemetry.execute(
+      [:vintage_net_qmi, :connection, :end],
+      %{duration: System.monotonic_time() - state.reported_status_timestamp},
+      %{ifname: state.ifname, status: state.reported_status}
+    )
+
+    :telemetry.execute(
+      [:vintage_net_qmi, :connection],
+      %{},
+      %{ifname: state.ifname, status: new_connection}
+    )
+
+    %{state | reported_status_timestamp: reported_status_timestamp}
+  end
 
   defp has_ipv4_address?(nil), do: false
 
