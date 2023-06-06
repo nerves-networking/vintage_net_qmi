@@ -3,7 +3,6 @@
 [![Hex version](https://img.shields.io/hexpm/v/vintage_net_qmi.svg "Hex version")](https://hex.pm/packages/vintage_net_qmi)
 [![API docs](https://img.shields.io/hexpm/v/vintage_net_qmi.svg?label=hexdocs "API docs")](https://hexdocs.pm/vintage_net_qmi/VintageNetQMI.html)
 [![CircleCI](https://circleci.com/gh/nerves-networking/vintage_net_qmi.svg?style=svg)](https://circleci.com/gh/nerves-networking/vintage_net_qmi)
-[![Coverage Status](https://coveralls.io/repos/github/nerves-networking/vintage_net_qmi/badge.svg?branch=main)](https://coveralls.io/github/nerves-networking/vintage_net_qmi?branch=main)
 
 This library provides a `VintageNet` technology for cellular modems that
 support the Qualcomm MSM Interface. This includes most USB cellular modems.

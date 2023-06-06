@@ -35,8 +35,7 @@ defmodule VintageNetQMI.MixProject do
       {:qmi, "~> 0.8.4"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.3.0", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.23", only: :docs, runtime: false},
-      {:excoveralls, "~> 0.14", only: :test, runtime: false}
+      {:ex_doc, "~> 0.23", only: :docs, runtime: false}
     ]
   end
 
