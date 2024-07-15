@@ -10,6 +10,7 @@ defmodule VintageNetQMI.MixProject do
       version: @version,
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
+      aliases: [compile: ["compile", &build_mcc_mnc_csv/1]],
       deps: deps(),
       description: description(),
       dialyzer: dialyzer(),
@@ -32,7 +33,7 @@ defmodule VintageNetQMI.MixProject do
   defp deps do
     [
       {:vintage_net, "~> 0.12.0 or ~> 0.13.0"},
-      {:qmi, "~> 0.8.4"},
+      {:qmi, "~> 0.9.0"},
       {:credo, "~> 1.5", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4.1", only: :dev, runtime: false},
       {:ex_doc, "~> 0.23", only: :docs, runtime: false}
@@ -72,5 +73,28 @@ defmodule VintageNetQMI.MixProject do
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
     ]
+  end
+
+  # Reduce the size of the original csv to contain only the used fields and
+  # sort so the output looks less haphazard. No optimizations currently take
+  # advantage of the sort.
+  defp build_mcc_mnc_csv(_) do
+    input_path = "mcc-mnc.csv"
+    priv_dir = Application.app_dir(:vintage_net_qmi, ["priv"])
+    out_path = Path.join(priv_dir, "mcc-mnc.csv")
+
+    _ = File.mkdir_p(priv_dir)
+
+    File.stream!(input_path)
+    |> Stream.drop(1)
+    |> Stream.map(&String.split(&1, ";"))
+    |> Stream.map(fn [_mcc, _mnc, plmn, _, _, _, _, brand, _, _ | _] ->
+      [String.to_integer(plmn), brand]
+    end)
+    |> Stream.reject(fn [_, brand] -> brand == "" end)
+    |> Stream.uniq_by(fn [plmn | _] -> plmn end)
+    |> Enum.sort()
+    |> Enum.map(fn [plmn, brand] -> [Integer.to_string(plmn), ";", brand, "\n"] end)
+    |> then(&File.write!(out_path, &1))
   end
 end

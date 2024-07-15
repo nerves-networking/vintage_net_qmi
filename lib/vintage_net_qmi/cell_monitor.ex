@@ -1,6 +1,8 @@
 defmodule VintageNetQMI.CellMonitor do
   @moduledoc false
 
+  alias VintageNetQMI.MCCMNC
+
   use GenServer
 
   @type arg() :: {:ifname, binary(), poll_interval: non_neg_integer()}
@@ -40,8 +42,8 @@ defmodule VintageNetQMI.CellMonitor do
     {:ok, poll_ref} = :timer.send_interval(state.poll_interval, :poll)
 
     state =
-      NetworkAccess.get_home_network(state.qmi)
-      |> maybe_post_home_network(state)
+      NetworkAccess.get_sys_info(state.qmi)
+      |> maybe_post_lte_sys_info(state)
       |> put_poll_ref(poll_ref)
 
     {:noreply, state}
@@ -49,8 +51,8 @@ defmodule VintageNetQMI.CellMonitor do
 
   def handle_info(:poll, state) do
     state =
-      NetworkAccess.get_home_network(state.qmi)
-      |> maybe_post_home_network(state)
+      NetworkAccess.get_sys_info(state.qmi)
+      |> maybe_post_lte_sys_info(state)
 
     {:noreply, state}
   end
@@ -59,17 +61,17 @@ defmodule VintageNetQMI.CellMonitor do
     {:noreply, state}
   end
 
-  defp maybe_post_home_network({:ok, home_network}, state) do
+  defp maybe_post_lte_sys_info({:ok, %{lte_sys_info: %{mcc: mcc, mnc: mnc}}}, state) do
     PropertyTable.put_many(VintageNet, [
-      {["interface", state.ifname, "mobile", "mcc"], home_network.mcc},
-      {["interface", state.ifname, "mobile", "mnc"], home_network.mnc},
-      {["interface", state.ifname, "mobile", "provider"], home_network.provider}
+      {["interface", state.ifname, "mobile", "mcc"], mcc},
+      {["interface", state.ifname, "mobile", "mnc"], mnc},
+      {["interface", state.ifname, "mobile", "provider"], MCCMNC.lookup_brand(mcc, mnc)}
     ])
 
     state
   end
 
-  defp maybe_post_home_network({:error, _reason} = error, state) do
+  defp maybe_post_lte_sys_info({:error, _reason} = error, state) do
     Logger.warning("[VintageNetQMI] failed getting home network: #{inspect(error)}")
     state
   end
