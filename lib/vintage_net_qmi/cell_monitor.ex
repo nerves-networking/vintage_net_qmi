@@ -62,10 +62,16 @@ defmodule VintageNetQMI.CellMonitor do
   end
 
   defp maybe_post_lte_sys_info({:ok, %{lte_sys_info: %{mcc: mcc, mnc: mnc}}}, state) do
+    provider =
+      case MCCMNC.lookup(mcc, mnc) do
+        {:ok, info} -> info.brand
+        _ -> nil
+      end
+
     PropertyTable.put_many(VintageNet, [
       {["interface", state.ifname, "mobile", "mcc"], mcc},
       {["interface", state.ifname, "mobile", "mnc"], mnc},
-      {["interface", state.ifname, "mobile", "provider"], MCCMNC.provider(mcc, mnc)}
+      {["interface", state.ifname, "mobile", "provider"], provider}
     ])
 
     state
