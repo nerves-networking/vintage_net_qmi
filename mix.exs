@@ -8,7 +8,7 @@ defmodule VintageNetQMI.MixProject do
     [
       app: :vintage_net_qmi,
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
