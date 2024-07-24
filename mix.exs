@@ -51,7 +51,7 @@ defmodule VintageNetQMI.MixProject do
 
   def docs do
     [
-      assets: "assets",
+      assets: %{"assets" => "assets"},
       extras: ["README.md", "CHANGELOG.md"],
       main: "readme",
       source_ref: "v#{@version}",
