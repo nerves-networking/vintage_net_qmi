@@ -68,7 +68,8 @@ defmodule VintageNetQMI.MixProject do
         "CHANGELOG.md",
         "LICENSE",
         "mix.exs",
-        "README.md"
+        "README.md",
+        "mcc-mnc.csv"
       ],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
