@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.4.0] - 2024-07-25
+
+### Changed
+
+* Require Elixir 1.14 and OTP 25. This was done to support more convenient
+  binary patterns in the QMI library.
+
+### Added
+
+* Determine the cellular provider a different way that works reliably with
+  multi-network SIM cards. This adds a small database to look up the provider
+  based on MCC and MNC.
+
 ## [v0.3.6] - 2023-05-16
 
 ### Changed
