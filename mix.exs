@@ -8,7 +8,7 @@ defmodule VintageNetQMI.MixProject do
     [
       app: :vintage_net_qmi,
       version: @version,
-      elixir: "~> 1.13",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       aliases: [compile: ["compile", &build_mcc_mnc_csv/1]],
       deps: deps(),
