@@ -81,7 +81,7 @@ defmodule VintageNetQMI.MixProject do
   # advantage of the sort.
   defp build_mcc_mnc_csv(_) do
     input_path = "mcc-mnc.csv"
-    priv_dir = Application.app_dir(:vintage_net_qmi, ["priv"])
+    priv_dir = Path.join(Mix.Project.app_path(), "priv")
     out_path = Path.join(priv_dir, "mcc-mnc.csv")
 
     _ = File.mkdir_p(priv_dir)
