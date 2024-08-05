@@ -11,7 +11,7 @@ defmodule VintageNetQMI.Connection do
 
   require Logger
 
-  @configuration_retry 5_000
+  @configuration_retry 30_000
 
   @typedoc """
   Options for to establish the connection
