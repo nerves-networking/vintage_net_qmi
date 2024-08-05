@@ -22,18 +22,18 @@ defmodule VintageNetQMI.ServiceProvider do
   @doc """
   Select the provider by the iccid
   """
-  @spec select_provider_by_iccid([t()], binary()) :: t() | nil
+  @spec select_provider_by_iccid([t()], binary()) :: {:ok, t()} | {:error, :no_provider}
   def select_provider_by_iccid(providers, iccid) do
-    Enum.reduce_while(providers, nil, fn
-      %{only_iccid_prefixes: prefixes} = provider, default ->
+    Enum.reduce_while(providers, {:error, :no_provider}, fn
+      %{only_iccid_prefixes: prefixes} = provider, best ->
         if is_binary(iccid) && String.starts_with?(iccid, prefixes) do
-          {:halt, provider}
+          {:halt, {:ok, provider}}
         else
-          {:cont, default}
+          {:cont, best}
         end
 
       provider, _default ->
-        {:cont, provider}
+        {:cont, {:ok, provider}}
     end)
   end
 end

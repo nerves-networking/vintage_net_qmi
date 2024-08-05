@@ -8,7 +8,7 @@ defmodule VintageNetQMI.ServiceProviderTest do
       provider = %{apn: "fake"}
       iccid = "891004234814455936F"
 
-      assert provider == ServiceProvider.select_provider_by_iccid([provider], iccid)
+      assert {:ok, provider} == ServiceProvider.select_provider_by_iccid([provider], iccid)
     end
 
     test "when prefix option matches the ICCID prefixes" do
@@ -22,15 +22,18 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       [first_provider, second_provider | _] = providers
 
-      assert first_provider == ServiceProvider.select_provider_by_iccid(providers, first_iccid)
-      assert second_provider == ServiceProvider.select_provider_by_iccid(providers, second_iccid)
+      assert {:ok, first_provider} ==
+               ServiceProvider.select_provider_by_iccid(providers, first_iccid)
+
+      assert {:ok, second_provider} ==
+               ServiceProvider.select_provider_by_iccid(providers, second_iccid)
     end
 
     test "when prefix option does not match ICCID prefix" do
       provider = %{apn: "not me", only_iccid_prefixes: ["89171717"]}
       iccid = "891004234814455936F"
 
-      assert nil ==
+      assert {:error, :no_provider} ==
                ServiceProvider.select_provider_by_iccid([provider], iccid)
     end
 
@@ -44,7 +47,7 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       [_, this_one | _] = providers
 
-      assert this_one == ServiceProvider.select_provider_by_iccid(providers, iccid)
+      assert {:ok, this_one} == ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
 
     test "default to service provider with out ICCID selection when non match" do
@@ -55,7 +58,8 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       iccid = "8947571711111111FF"
 
-      assert List.first(providers) == ServiceProvider.select_provider_by_iccid(providers, iccid)
+      assert {:ok, List.first(providers)} ==
+               ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
 
     test "when iccid is nil select default without ICCID" do
@@ -66,7 +70,8 @@ defmodule VintageNetQMI.ServiceProviderTest do
 
       iccid = nil
 
-      assert List.first(providers) == ServiceProvider.select_provider_by_iccid(providers, iccid)
+      assert {:ok, List.first(providers)} ==
+               ServiceProvider.select_provider_by_iccid(providers, iccid)
     end
   end
 end

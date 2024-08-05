@@ -43,14 +43,17 @@ defmodule VintageNetQMI.Connection do
     GenServer.cast(name(ifname), {:process_stats, stats})
   end
 
+  defp mobile_prop(ifname, key), do: ["interface", ifname, "mobile", key]
+
   @impl GenServer
   def init(args) do
     ifname = Keyword.fetch!(args, :ifname)
     providers = Keyword.fetch!(args, :service_providers)
     radio_technologies = Keyword.get(args, :radio_technologies)
 
-    VintageNet.subscribe(["interface", ifname, "mobile", "iccid"])
-    iccid = VintageNet.get(["interface", ifname, "mobile", "iccid"])
+    iccid_property = mobile_prop(ifname, "iccid")
+    VintageNet.subscribe(iccid_property)
+    iccid = VintageNet.get(iccid_property)
 
     state =
       %{
@@ -104,11 +107,7 @@ defmodule VintageNetQMI.Connection do
     timestamp = System.monotonic_time()
     stats_with_timestamp = Map.put(stats, :timestamp, timestamp)
 
-    PropertyTable.put(
-      VintageNet,
-      ["interface", state.ifname, "mobile", "statistics"],
-      stats_with_timestamp
-    )
+    PropertyTable.put(VintageNet, mobile_prop(state.ifname, "statistics"), stats_with_timestamp)
 
     {:noreply, state}
   end
@@ -140,14 +139,12 @@ defmodule VintageNetQMI.Connection do
 
   defp try_to_connect(state) do
     three_3gpp_profile_index = 1
+    iccid = state.iccid
+    providers = state.service_providers
 
-    with %{} = provider <-
-           ServiceProvider.select_provider_by_iccid(state.service_providers, state.iccid),
-         PropertyTable.put(
-           VintageNet,
-           ["interface", state.ifname, "mobile", "apn"],
-           provider.apn
-         ),
+    with :ok <- validate_iccid(iccid),
+         {:ok, provider} <- ServiceProvider.select_provider_by_iccid(providers, iccid),
+         PropertyTable.put(VintageNet, mobile_prop(state.ifname, "apn"), provider.apn),
          :ok <- set_roaming_allowed_for_provider(provider, three_3gpp_profile_index, state),
          {:ok, _} <-
            WirelessData.start_network_interface(state.qmi,
@@ -157,7 +154,7 @@ defmodule VintageNetQMI.Connection do
       Logger.info("[VintageNetQMI]: network started. Waiting on DHCP")
       state
     else
-      nil ->
+      {:error, :no_provider} ->
         Logger.warning(
           "[VintageNetQMI]: cannot select an APN to use from the configured service providers, check your configuration for VintageNet."
         )
@@ -177,6 +174,9 @@ defmodule VintageNetQMI.Connection do
         start_try_to_connect_timer(state)
     end
   end
+
+  defp validate_iccid(iccid) when is_binary(iccid), do: :ok
+  defp validate_iccid(_iccid), do: {:error, :missing_iccid}
 
   defp set_roaming_allowed_for_provider(
          %{roaming_allowed?: roaming_allowed?},
