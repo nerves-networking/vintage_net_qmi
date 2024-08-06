@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.4.1] - 2024-08-06
+
+### Changed
+
+* Fix various ways that a cellular module with trouble reading a SIM card could
+  cause a crash. This was a low probability event that actually accumulated a
+  lot of crash reports.
+* Reduce retry rate for SIM card read errors from 1s to 5s. These are unlikely
+  to recover and retrying every second logged a lot.
+
 ## [v0.4.0] - 2024-07-25
 
 ### Changed
@@ -231,6 +241,8 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.4.1]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.4.0...v0.4.1
+[v0.4.0]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.6...v0.4.0
 [v0.3.6]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.5...v0.3.6
 [v0.3.5]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.4...v0.3.5
 [v0.3.4]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.3...v0.3.4
