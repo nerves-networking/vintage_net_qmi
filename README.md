@@ -206,8 +206,14 @@ official Nerves systems.
 Enable QMI and drivers for your modem:
 
 ```text
+CONFIG_USB_USBNET=m
 CONFIG_USB_NET_CDC_NCM=m
-CONFIG_USB_NET_HUAWEI_CDC_NCM=m
 CONFIG_USB_NET_QMI_WWAN=m
 CONFIG_USB_SERIAL_OPTION=m
+```
+
+If you're using a Huawei modem, you might also want:
+
+```text
+CONFIG_USB_NET_HUAWEI_CDC_NCM=m
 ```
