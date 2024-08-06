@@ -114,10 +114,11 @@ defmodule VintageNetQMI.Connection do
 
   @impl GenServer
   def handle_info(
-        {VintageNet, ["interface", ifname, "mobile", "iccid"], nil, iccid, _meta},
-        %{ifname: ifname} = state
-      ) do
-    new_state = %{state | iccid: iccid}
+        {VintageNet, ["interface", ifname, "mobile", "iccid"], _, new_iccid, _meta},
+        %{ifname: ifname, iccid: old_iccid} = state
+      )
+      when new_iccid != old_iccid do
+    new_state = %{state | iccid: new_iccid}
 
     {:noreply, try_to_connect(new_state)}
   end
@@ -135,6 +136,10 @@ defmodule VintageNetQMI.Connection do
 
   def handle_info(:try_to_connect, state) do
     {:noreply, try_to_connect(state)}
+  end
+
+  def handle_info(_message, state) do
+    {:noreply, state}
   end
 
   defp try_to_connect(state) do
@@ -161,6 +166,13 @@ defmodule VintageNetQMI.Connection do
 
         state
 
+      {:error, :invalid_iccid} ->
+        Logger.warning(
+          "[VintageNetQMI] ICCID, #{inspect(iccid)}, is invalid. Waiting for a valid one."
+        )
+
+        state
+
       {:error, :no_effect} ->
         # no effect means that a network connection as already be established
         # so we don't need to try to connect again.
@@ -176,7 +188,7 @@ defmodule VintageNetQMI.Connection do
   end
 
   defp validate_iccid(iccid) when is_binary(iccid), do: :ok
-  defp validate_iccid(_iccid), do: {:error, :missing_iccid}
+  defp validate_iccid(_iccid), do: {:error, :invalid_iccid}
 
   defp set_roaming_allowed_for_provider(
          %{roaming_allowed?: roaming_allowed?},
