@@ -8,6 +8,8 @@ defmodule VintageNetQMI.ModemInfo do
   @iccid_file_id 0x2FE2
   @main_file_path 0x3F00
 
+  @info_retry_delay 5_000
+
   use GenServer, restart: :transient
 
   require Logger
@@ -125,7 +127,7 @@ defmodule VintageNetQMI.ModemInfo do
   end
 
   defp retry(name) do
-    Process.send_after(self(), name, 1_000)
+    Process.send_after(self(), name, @info_retry_delay)
   end
 
   @impl GenServer
