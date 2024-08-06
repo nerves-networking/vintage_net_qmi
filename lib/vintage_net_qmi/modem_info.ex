@@ -61,7 +61,7 @@ defmodule VintageNetQMI.ModemInfo do
         return_value(%{state | iccid: true})
 
       {:error, reason} ->
-        Logger.warning("[VintageNetQMI] unable to get CCID for #{inspect(reason)}")
+        Logger.warning("[VintageNetQMI] unable to get ICCID for #{inspect(reason)}")
         retry_and_return(:get_iccid, state)
     end
   end
