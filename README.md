@@ -140,14 +140,14 @@ technology the following:
 | `signal_asu`  | `0-31,99`      | Reported Arbitrary Strength Unit (ASU) |
 | `signal_4bars` | `0-4`         | The signal level in "bars"    |
 | `signal_dbm`  | `-144 - -44`   | The signal level in dBm. Interpretation depends on the connection technology. |
-| `mcc`         | `0-999`        | Mobile Country Code for the network |
-| `mnc`         | `0-999`        | Mobile Network Code for the network |
+| `mcc`         | `0-999` | `nil`| Mobile Country Code for the network |
+| `mnc`         | `0-999` | `nil`| Mobile Network Code for the network |
 | `iccid`       | string         | The Integrated Circuit Card Identifier (ICCID) |
 | `esn`         | string         | The Electronic Serial Number (ESN) |
 | `imei`        | string         | International Mobile Equipment Identity (IMEI) |
 | `meid`        | string         | The Mobile Equipment Identifier (MEID) |
 | `imeisv_svn`  | string         | IMEI software version number |
-| `provider`    | string         | The name of the service provider |
+| `provider`    | string | `nil` | The name of the service provider |
 | `lac`         | `0-65533`      | The Location Area Code (lac) for the current cell |
 | `cid`         | `0-268435455`  | The Cell ID (cid) for the current cell |
 | `network_datetime` | `NaiveDateTime.t()` | The reported datetime from the network |
@@ -161,6 +161,7 @@ technology the following:
 | `manufacturer` | string        | The name of the manufacturer of the modem |
 | `model`       | string         | The name of the model of the modem        |
 | `apn`         | string         | The APN that VintageNetQMI configured the modem to use |
+| `sim_rej_info`| atom           | The reason (if any) a SIM was rejected |
 
 The following properties are TBD:
 

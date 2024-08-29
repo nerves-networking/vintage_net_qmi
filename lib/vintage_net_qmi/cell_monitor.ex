@@ -71,6 +71,25 @@ defmodule VintageNetQMI.CellMonitor do
     state
   end
 
+  defp maybe_post_lte_sys_info(
+         {:ok, %{srv_reg_restriction: :unrestricted, sim_rej_info: reject_info}},
+         state
+       ) do
+    PropertyTable.put_many(VintageNet, [
+      {["interface", state.ifname, "mobile", "sim_rej_info"], reject_info},
+      {["interface", state.ifname, "mobile", "mcc"], nil},
+      {["interface", state.ifname, "mobile", "mnc"], nil},
+      {["interface", state.ifname, "mobile", "provider"], nil}
+    ])
+
+    state
+  end
+
+  defp maybe_post_lte_sys_info({:ok, unhandled}, state) do
+    Logger.warning("[VintageNetQMI] Unhandled LTE SYS info: #{inspect(unhandled)}")
+    state
+  end
+
   defp maybe_post_lte_sys_info({:error, _reason} = error, state) do
     Logger.warning("[VintageNetQMI] failed getting home network: #{inspect(error)}")
     state
