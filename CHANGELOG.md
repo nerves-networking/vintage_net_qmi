@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.4.2] - 2024-08-30
+
+### Added
+
+* `sim_rej_info` has been added to the PropertyTable.
+
+### Changed
+
+* PropertyTable properties have been updated to not contain invalid characters
+  * MNC
+  * MCC
+* `provider` PropertyTable property Will now work correctly with updated MNC/MCC properties.
+
 ## [v0.4.1] - 2024-08-06
 
 ### Changed
