@@ -33,7 +33,7 @@ defmodule VintageNetQMI.SignalMonitor do
 
   @impl GenServer
   def handle_info(:signal_check, state) do
-    :ok = get_signal_stats(state)
+    post_signal_stats(state)
 
     send_msgs([:signal_check], state.interval)
 
@@ -54,17 +54,20 @@ defmodule VintageNetQMI.SignalMonitor do
     {:noreply, state}
   end
 
-  defp get_signal_stats(state) do
-    {:ok, %{rssi_reports: [rssi_data]}} = NetworkAccess.get_signal_strength(state.qmi)
+  defp post_signal_stats(state) do
+    {:ok, %{rssi_reports: reports}} = NetworkAccess.get_signal_strength(state.qmi)
 
-    rssi_data
-    |> to_rssi()
-    |> post_signal_rssi(state.ifname)
+    case first_rssi_info(reports) do
+      {:ok, info} -> post_signal_rssi(info, state.ifname)
+      :error -> :ok
+    end
   end
 
-  defp to_rssi(%{rssi: rssi}) do
-    ASUCalculator.from_lte_rssi(rssi)
-  end
+  defp first_rssi_info([%{radio: :lte, rssi: rssi} | _rest]),
+    do: {:ok, ASUCalculator.from_lte_rssi(rssi)}
+
+  defp first_rssi_info([_unsupported | rest]), do: first_rssi_info(rest)
+  defp first_rssi_info([]), do: :error
 
   defp post_signal_rssi(%{asu: asu, dbm: dbm, bars: bars}, ifname) do
     PropertyTable.put_many(VintageNet, [
