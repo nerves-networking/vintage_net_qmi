@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.4.3] - 2024-09-13
+
+### Changed
+
+* Handle more than one RSSI report for modems that are capable of reporting more
+  than one cellular technology's strength at a time.
+
 ## [v0.4.2] - 2024-08-30
 
 ### Added
@@ -254,6 +261,8 @@ code that this is subscribe to this property to have the correct spelling.
 
 Initial Release
 
+[v0.4.3]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.4.2...v0.4.3
+[v0.4.2]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.6...v0.4.0
 [v0.3.6]: https://github.com/nerves-networking/vintage_net_qmi/compare/v0.3.5...v0.3.6
