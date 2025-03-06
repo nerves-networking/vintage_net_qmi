@@ -66,13 +66,19 @@ defmodule VintageNetQMI.MixProject do
       files: [
         "lib",
         "CHANGELOG.md",
-        "LICENSE",
+        "LICENSES/*",
         "mix.exs",
+        "NOTICE",
         "README.md",
+        "REUSE.toml",
         "mcc-mnc.csv"
       ],
-      licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url}
+      licenses: ["Apache-2.0", "MIT"],
+      links: %{
+        "GitHub" => @source_url,
+        "REUSE Compliance" =>
+          "https://api.reuse.software/info/github.com/nerves-networking/vintage_net_qmi"
+      }
     ]
   end
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Connor Rigby
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetQMI.MCCMNCTest do
   use ExUnit.Case, async: true
   alias VintageNetQMI.MCCMNC
