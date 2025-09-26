@@ -142,7 +142,8 @@ defmodule VintageNetQMI do
        ]},
       {VintageNetQMI.CellMonitor, [ifname: ifname]},
       {VintageNetQMI.SignalMonitor, [ifname: ifname]},
-      {VintageNetQMI.ModemInfo, ifname: ifname}
+      {VintageNetQMI.ModemInfo, ifname: ifname},
+      {VintageNetQMI.MtuManager, ifname: ifname}
     ]
 
     # QMI uses DHCP to report IP addresses, gateway, DNS, etc.
