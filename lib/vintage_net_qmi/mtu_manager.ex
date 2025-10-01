@@ -40,9 +40,14 @@ defmodule VintageNetQMI.MtuManager do
         %{ifname: ifname} = state
       )
       when status in [:lan, :internet] do
-    _ = apply_mtu_and_mss(state)
-    {:ok, ref} = :timer.send_interval(state.refresh_ms, :refresh)
-    {:noreply, %{state | refresh_ref: ref}}
+    case apply_mtu_and_mss(state) do
+      :noop ->
+        {:ok, ref} = :timer.send_interval(state.refresh_ms, :refresh)
+        {:noreply, %{state | refresh_ref: ref}}
+
+      _ ->
+        {:noreply, state}
+    end
   end
 
   def handle_info(
@@ -53,9 +58,15 @@ defmodule VintageNetQMI.MtuManager do
     {:noreply, %{state | refresh_ref: nil}}
   end
 
-  def handle_info(:refresh, state) do
-    _ = apply_mtu_and_mss(state)
-    {:noreply, state}
+  def handle_info(:refresh, %{refresh_ref: ref} = state) do
+    case apply_mtu_and_mss(state) do
+      :ok ->
+        if is_reference(ref), do: Process.cancel_timer(ref)
+        {:noreply, %{state | refresh_ref: nil}}
+
+      _ ->
+        {:noreply, state}
+    end
   end
 
   defp apply_mtu_and_mss(%{ifname: ifname, qmi: qmi}) do
