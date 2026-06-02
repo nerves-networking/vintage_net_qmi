@@ -1,7 +1,7 @@
 # VintageNetQMI
 
 [![Hex version](https://img.shields.io/hexpm/v/vintage_net_qmi.svg "Hex version")](https://hex.pm/packages/vintage_net_qmi)
-[![API docs](https://img.shields.io/hexpm/v/vintage_net_qmi.svg?label=hexdocs "API docs")](https://hexdocs.pm/vintage_net_qmi/VintageNetQMI.html)
+[![API docs](https://img.shields.io/hexpm/v/vintage_net_qmi.svg?label=hexdocs "API docs")](https://vintage-net-qmi.hexdocs.pm/VintageNetQMI.html)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/nerves-networking/vintage_net_qmi/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/nerves-networking/vintage_net_qmi/tree/main)
 [![REUSE status](https://api.reuse.software/badge/github.com/nerves-networking/vintage_net_qmi)](https://api.reuse.software/info/github.com/nerves-networking/vintage_net_qmi)
 
@@ -107,7 +107,7 @@ VintageNet.configure("wwan0", %{
 
 The example above will limit the possible RATs used to `:lte` (4G) and `:umts`
 (3G). For more information which radio technologies are available please see
-the `:qmi` [documentation](https://hexdocs.pm/qmi/QMI.Codec.NetworkAccess.html#t:radio_interface/0).
+the `:qmi` [documentation](https://qmi.hexdocs.pm/QMI.Codec.NetworkAccess.html#t:radio_interface/0).
 
 If this configuration is provided, the modem will use the default configuration
 that provided by the manufacturer.
