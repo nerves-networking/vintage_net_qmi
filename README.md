@@ -7,8 +7,14 @@
 
 This library provides a `VintageNet` technology for cellular modems that
 support the Qualcomm MSM Interface. This includes most USB cellular modems.
-See [`VintageNetMobile`](https://github.com/nerves-networking/vintage_net_mobile)
-if you have a modem that only supports an `AT` command interface.
+
+Before choosing this library, review the other cellular modem libraries:
+
+| Library | Data interface | Protocol | Notes |
+| ------- | -------------- | -------  | ----  |
+| [`VintageNetMobile`](https://hex.pm/packages/vintage_net_mobile) | UART (direct or over USB) | AT/PPP | Pretty much ever modem supports this, but it can be hard to use due to the control and data links being shared and vendor-specific commands |
+| [`VintageNetQMI`](https://hex.pm/packages/vintage_net_qmi) | USB | QMI | Generic control protocol for modems with a separate data path. Modems generally just work if they support this protocol. |
+| [`VintageNetECM`](https://hex.pm/packages/vintage_net_ecm) | USB | AT/CDC-ECM | AT commands for the control path and USB CDC-ECM for data. Newer modems are starting to make this the default. |
 
 To use this library, first add it to your project's dependency list:
 
