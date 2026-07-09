@@ -247,7 +247,6 @@ defmodule VintageNetQMI.Connectivity do
   #   indication_id: 36,
   #   name: :serving_system_indication,
   #   service_id: 3,
-  #   serving_system_cs_attach_state: :attached,
   #   serving_system_ps_attach_state: :attached,
   #   serving_system_radio_interfaces: [:lte],
   #   serving_system_registration_state: :registered,
@@ -255,7 +254,6 @@ defmodule VintageNetQMI.Connectivity do
   # }
   defp derive_status(%{
          serving_system: %{
-           serving_system_cs_attach_state: :attached,
            serving_system_ps_attach_state: :attached,
            serving_system_radio_interfaces: radio_ifs,
            serving_system_registration_state: :registered,
