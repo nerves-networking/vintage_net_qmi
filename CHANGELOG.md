@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.4.5] - 2025-07-09
+
+### Changed
+
+* Remove unintentinoal requirement on the cell tower reporting a circuit
+  switched connection for reporting Internet connectivity. Thanks to @jollyjerr
+  for reporting that some cell towers were no longer supporting this and that
+  the check should be removed.
+* Set network interface MTU based on report from the modem. Thanks to
+  @@joserp93.
+* Drop support for Elixir 1.14
+
 ## [v0.4.4] - 2025-06-09
 
 ### Added
