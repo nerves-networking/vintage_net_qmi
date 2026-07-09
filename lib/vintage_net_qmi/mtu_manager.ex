@@ -54,14 +54,14 @@ defmodule VintageNetQMI.MtuManager do
         {VintageNet, ["interface", ifname, "connection"], _old, _status, _meta},
         %{ifname: ifname, refresh_ref: ref} = state
       ) do
-    if is_reference(ref), do: Process.cancel_timer(ref)
+    cancel_refresh_timer(ref)
     {:noreply, %{state | refresh_ref: nil}}
   end
 
   def handle_info(:refresh, %{refresh_ref: ref} = state) do
     case apply_mtu_and_mss(state) do
       :ok ->
-        if is_reference(ref), do: Process.cancel_timer(ref)
+        cancel_refresh_timer(ref)
         {:noreply, %{state | refresh_ref: nil}}
 
       _ ->
@@ -93,7 +93,16 @@ defmodule VintageNetQMI.MtuManager do
     end
   end
 
+  defp cancel_refresh_timer(ref) when is_reference(ref) do
+    _ = Process.cancel_timer(ref)
+    :ok
+  end
+
+  defp cancel_refresh_timer(_ref), do: :ok
+
   defp set_mtu_linux(ifname, mtu) do
-    System.cmd("ip", ["link", "set", "dev", ifname, "mtu", Integer.to_string(mtu)])
+    # Best effort
+    _ = System.cmd("ip", ["link", "set", "dev", ifname, "mtu", Integer.to_string(mtu)])
+    :ok
   end
 end
