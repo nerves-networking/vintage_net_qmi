@@ -34,6 +34,7 @@ defmodule VintageNetQMITest do
         {VintageNetQMI.CellMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.SignalMonitor, [ifname: "wwan0"]},
         {VintageNetQMI.ModemInfo, [ifname: "wwan0"]},
+        {VintageNetQMI.MtuManager, [ifname: "wwan0"]},
         Utils.udhcpc_child_spec("wwan0", "unit_test")
       ],
       down_cmds: [
